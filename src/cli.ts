@@ -47,21 +47,7 @@ program
   .option('--env <env>', '环境配置文件')
   .action(deployApp)
 
-// MCP相关命令
-program
-  .command('mcp:server')
-  .description('启动MCP HTTP服务器')
-  .option('-p, --port <port>', '端口号', '9529')
-  .action(async (options) => {
-    try {
-      const { VibeCLIMCPHTTPServer } = await import('./mcp/http-server.js')
-      const server = new VibeCLIMCPHTTPServer(parseInt(options.port))
-      await server.start()
-    } catch (error) {
-      console.error(chalk.red('Failed to start MCP server:'), error)
-      process.exit(1)
-    }
-  })
+// MCP相关命令 - 使用单独的可执行文件 vibecli-mcp-server
 
 // 显示帮助信息
 program.on('--help', () => {

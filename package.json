@@ -1,6 +1,6 @@
 {
   "name": "vibe-cli-tool",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "AI驱动的现代化Web全栈应用CLI工具，支持MCP协议和智能项目生成",
   "type": "module",
   "main": "dist/index.js",
@@ -9,8 +9,7 @@
     "vibecli": "dist/cli.js",
     "vibe": "dist/cli.js",
     "create-vibe-app": "dist/cli.js",
-    "vibecli-mcp-server": "dist/mcp/mcp-server.js",
-    "vibecli-http-server": "dist/mcp-server.js"
+    "vibecli-mcp-server": "dist/mcp/stdio-server.js"
   },
   "scripts": {
     "build": "tsc",
