@@ -9,7 +9,8 @@
     "vibecli": "dist/cli.js",
     "vibe": "dist/cli.js",
     "create-vibe-app": "dist/cli.js",
-    "vibecli-mcp-server": "dist/mcp-server.js"
+    "vibecli-mcp-server": "dist/mcp/stdio-server.js",
+    "vibecli-http-server": "dist/mcp-server.js"
   },
   "scripts": {
     "build": "tsc",

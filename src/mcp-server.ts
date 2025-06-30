@@ -8,7 +8,7 @@ async function main() {
   const chalk = (await import('chalk')).default
   console.log(chalk.blue.bold('\n🚀 启动VibeCLI MCP Server\n'))
 
-  const port = parseInt(process.env.VIBECLI_MCP_PORT || '3001')
+  const port = parseInt(process.env.VIBECLI_MCP_PORT || '9529')
   const server = new VibeCLIMCPHTTPServer(port)
 
   // 优雅关闭处理

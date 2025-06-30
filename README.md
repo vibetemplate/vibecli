@@ -58,11 +58,11 @@ npm run mcp:server
 #### 1. 启动 MCP 服务器
 
 ```bash
-# 使用默认端口 3001
+# 使用默认端口 9529
 vibecli-mcp-server
 
 # 或指定端口
-VIBECLI_MCP_PORT=3002 vibecli-mcp-server
+VIBECLI_MCP_PORT=9530 vibecli-mcp-server
 ```
 
 #### 2. 配置 MCP 客户端
@@ -77,7 +77,7 @@ VIBECLI_MCP_PORT=3002 vibecli-mcp-server
       "command": "npx",
       "args": ["-y", "vibe-cli-tool", "mcp:server"],
       "env": {
-        "VIBECLI_MCP_PORT": "3001",
+        "VIBECLI_MCP_PORT": "9529",
         "NODE_ENV": "production"
       }
     }
@@ -94,7 +94,7 @@ VIBECLI_MCP_PORT=3002 vibecli-mcp-server
     "vibecli": {
       "command": "vibecli-mcp-server",
       "env": {
-        "VIBECLI_MCP_PORT": "3001",
+        "VIBECLI_MCP_PORT": "9529",
         "NODE_ENV": "production"
       }
     }
@@ -151,7 +151,7 @@ VIBECLI_MCP_PORT=3002 vibecli-mcp-server
 
 ```bash
 # 环境变量配置
-export VIBECLI_MCP_PORT=3001          # MCP服务器端口
+export VIBECLI_MCP_PORT=9529          # MCP服务器端口
 export VIBECLI_LOG_LEVEL=info         # 日志级别
 export VIBECLI_SESSION_TIMEOUT=1800   # 会话超时时间(秒)
 export VIBECLI_MAX_PROJECTS=50        # 最大并发项目数
