@@ -45,12 +45,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vibecli/vibecli.git"
+    "url": "https://github.com/wutongci/vibecli.git"
   },
   "bugs": {
-    "url": "https://github.com/vibecli/vibecli/issues"
+    "url": "https://github.com/wutongci/vibecli/issues"
   },
-  "homepage": "https://github.com/vibecli/vibecli#readme",
+  "homepage": "https://github.com/wutongci/vibecli#readme",
   "dependencies": {
     "chalk": "^5.3.0",
     "commander": "^11.1.0",
