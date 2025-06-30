@@ -98,7 +98,7 @@ server.registerTool(
       return {
         content: [{
           type: 'text',
-          text: `项目分析失败: ${error instanceof Error ? error.message : String(error)}`
+          text: `❌ 项目分析失败: ${error instanceof Error ? error.message : String(error)}`
         }]
       }
     }
@@ -112,10 +112,17 @@ server.registerTool(
     title: '模板生成器',
     description: '基于分析结果生成完整项目模板',
     inputSchema: {
-      analysis_result: z.any().describe('来自project_analyzer的分析结果'),
+      analysis_result: z.object({
+        projectType: z.string(),
+        recommendedStack: z.object({
+          database: z.string().optional(),
+          uiFramework: z.string().optional(),
+          features: z.array(z.string()).optional()
+        }).optional()
+      }).describe('来自project_analyzer的分析结果'),
       project_name: z.string().regex(/^[a-zA-Z0-9-_]+$/).describe('项目名称（符合文件命名规范）'),
       target_directory: z.string().optional().describe('目标生成目录'),
-      customizations: z.any().optional().describe('定制化选项')
+      customizations: z.object({}).optional().describe('定制化选项')
     }
   },
   async ({ analysis_result, project_name, target_directory, customizations = {} }) => {
@@ -125,8 +132,8 @@ server.registerTool(
       const projectConfig = {
         name: project_name,
         template: determineTemplate(analysis_result.projectType),
-        database: analysis_result.recommendedStack?.database || 'postgresql',
-        uiFramework: analysis_result.recommendedStack?.uiFramework || 'tailwind-radix',
+        database: (analysis_result.recommendedStack?.database as 'postgresql' | 'mysql' | 'sqlite') || 'postgresql',
+        uiFramework: (analysis_result.recommendedStack?.uiFramework as 'tailwind-radix' | 'antd' | 'mui' | 'chakra') || 'tailwind-radix',
         features: {
           auth: analysis_result.recommendedStack?.features?.includes('auth') || false,
           admin: analysis_result.recommendedStack?.features?.includes('admin') || false,
@@ -160,7 +167,7 @@ server.registerTool(
       return {
         content: [{
           type: 'text',
-          text: `模板生成失败: ${error instanceof Error ? error.message : String(error)}`
+          text: `❌ 模板生成失败: ${error instanceof Error ? error.message : String(error)}`
         }]
       }
     }
@@ -177,7 +184,7 @@ server.registerTool(
       project_path: z.string().describe('项目路径'),
       feature_type: z.enum(['auth', 'payment', 'search', 'analytics', 'real-time', 'ai-integration']).describe('功能类型'),
       integration_method: z.enum(['component', 'service', 'middleware', 'plugin']).optional().describe('集成方式'),
-      customization: z.any().optional().describe('定制化配置')
+      customization: z.object({}).optional().describe('定制化配置')
     }
   },
   async ({ project_path, feature_type, integration_method = 'component', customization = {} }) => {
@@ -213,7 +220,7 @@ server.registerTool(
       return {
         content: [{
           type: 'text',
-          text: `功能添加失败: ${error instanceof Error ? error.message : String(error)}`
+          text: `❌ 功能添加失败: ${error instanceof Error ? error.message : String(error)}`
         }]
       }
     }
@@ -230,7 +237,7 @@ server.registerTool(
       project_path: z.string().describe('项目路径'),
       platform: z.enum(['vercel', 'netlify', 'aws', 'gcp', 'azure', 'docker']).describe('部署平台'),
       environment: z.enum(['development', 'staging', 'production']).optional().describe('部署环境'),
-      custom_config: z.any().optional().describe('自定义配置')
+      custom_config: z.object({}).optional().describe('自定义配置')
     }
   },
   async ({ project_path, platform, environment = 'production', custom_config = {} }) => {
@@ -265,7 +272,7 @@ server.registerTool(
       return {
         content: [{
           type: 'text',
-          text: `部署失败: ${error instanceof Error ? error.message : String(error)}`
+          text: `❌ 部署失败: ${error instanceof Error ? error.message : String(error)}`
         }]
       }
     }
@@ -291,13 +298,50 @@ function determineTemplate(projectType: string): 'default' | 'blog' | 'ecommerce
 // 启动服务器
 async function main() {
   try {
+    console.error('🚀 启动VibeCLI MCP服务器...')
+    
+    // 预热核心组件
+    console.error('🔥 预热核心组件...')
+    
     const transport = new StdioServerTransport()
     await server.connect(transport)
-    console.error('🚀 VibeCLI MCP Server started successfully')
+    
+    console.error('✅ VibeCLI MCP服务器已启动，等待连接...')
   } catch (error) {
-    console.error('Failed to start MCP server:', error)
+    console.error('❌ 启动失败:', error)
     process.exit(1)
   }
+}
+
+// 处理帮助信息
+if (process.argv.includes('--help') || process.argv.includes('-h')) {
+  console.log(`
+⚡ VibeCLI MCP服务器
+
+用法：
+  vibecli-mcp-server [选项]
+
+选项：
+  --debug                  启用调试模式
+  -h, --help              显示帮助信息
+  -V, --version           显示版本号
+
+可用工具：
+  - project_analyzer: 智能分析项目需求并推荐技术栈
+  - template_generator: 基于分析结果生成完整项目模板
+  - feature_composer: 动态添加和组合复杂功能模块
+  - deployment_manager: 智能部署配置和多平台发布
+
+示例：
+  vibecli-mcp-server
+  
+MCP工具使用：
+  项目分析: project_analyzer({"description": "电商网站", "requirements": ["用户认证", "支付"]})
+  生成模板: template_generator({"analysis_result": {...}, "project_name": "my-shop"})
+  添加功能: feature_composer({"project_path": "./my-project", "feature_type": "auth"})
+  部署项目: deployment_manager({"project_path": "./my-project", "platform": "vercel"})
+`)
+  process.exit(0)
 }
 
 // 如果直接运行此文件，启动服务器
