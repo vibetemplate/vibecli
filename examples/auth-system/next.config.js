@@ -1,0 +1,63 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  
+  // 环境变量
+  env: {
+    CUSTOM_KEY: process.env.CUSTOM_KEY,
+  },
+
+  // API路由配置
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: process.env.NODE_ENV === 'development' 
+              ? 'http://localhost:3000' 
+              : process.env.NEXT_PUBLIC_APP_URL || '*'
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET,POST,PUT,DELETE,OPTIONS'
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type,Authorization'
+          },
+        ],
+      },
+    ]
+  },
+
+  // 重定向配置
+  async redirects() {
+    return [
+      {
+        source: '/auth',
+        destination: '/auth/login',
+        permanent: false,
+      },
+    ]
+  },
+
+  // TypeScript配置
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+
+  // ESLint配置
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
+
+  // 实验性功能
+  experimental: {
+    appDir: false, // 使用pages目录结构
+  },
+}
+
+module.exports = nextConfig

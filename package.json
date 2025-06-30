@@ -1,0 +1,99 @@
+{
+  "name": "@vibecli/core",
+  "version": "1.0.2",
+  "description": "快速创建现代化Web全栈应用的CLI工具",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "vibecli": "dist/cli.js",
+    "vibe": "dist/cli.js",
+    "create-vibe-app": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write src/**/*.ts",
+    "format:check": "prettier --check src/**/*.ts",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "web",
+    "nextjs",
+    "fullstack",
+    "cli",
+    "generator",
+    "typescript",
+    "prisma",
+    "tailwind",
+    "react",
+    "javascript",
+    "framework",
+    "template",
+    "scaffold"
+  ],
+  "author": {
+    "name": "VibeCLI Team",
+    "email": "support@vibecli.com",
+    "url": "https://github.com/vibecli"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vibecli/vibecli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vibecli/vibecli/issues"
+  },
+  "homepage": "https://github.com/vibecli/vibecli#readme",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "execa": "^8.0.1",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^9.2.12",
+    "mustache": "^4.2.0",
+    "ora": "^7.0.1",
+    "semver": "^7.5.4",
+    "validate-npm-package-name": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^9.0.7",
+    "@types/jest": "^29.5.8",
+    "@types/mustache": "^4.2.5",
+    "@types/node": "^20.10.0",
+    "@types/semver": "^7.5.6",
+    "@types/validate-npm-package-name": "^4.0.2",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "jest": "^29.7.0",
+    "prettier": "^3.1.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.2"
+  },
+  "files": [
+    "dist/**/*",
+    "templates/**/*",
+    "docs/**/*",
+    "README.md",
+    "LICENSE.md",
+    "ARCHITECTURE.md",
+    "API.md"
+  ],
+  "engines": {
+    "node": ">=18.17.0",
+    "npm": ">=9.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
