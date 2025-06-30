@@ -1,6 +1,6 @@
 {
   "name": "vibe-cli-tool",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "快速创建现代化Web全栈应用的CLI工具",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -45,12 +45,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wutongci/vibecli.git"
+    "url": "https://github.com/vibetemplate/vibecli.git"
   },
   "bugs": {
-    "url": "https://github.com/wutongci/vibecli/issues"
+    "url": "https://github.com/vibetemplate/vibecli/issues"
   },
-  "homepage": "https://github.com/wutongci/vibecli#readme",
+  "homepage": "https://github.com/vibetemplate/vibecli#readme",
   "dependencies": {
     "chalk": "^5.3.0",
     "commander": "^11.1.0",
