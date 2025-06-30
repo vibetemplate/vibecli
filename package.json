@@ -1,6 +1,6 @@
 {
   "name": "vibe-cli-tool",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "AI驱动的现代化Web全栈应用CLI工具，支持MCP协议和智能项目生成",
   "type": "module",
   "main": "dist/index.js",
