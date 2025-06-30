@@ -9,7 +9,7 @@
     "vibecli": "dist/cli.js",
     "vibe": "dist/cli.js",
     "create-vibe-app": "dist/cli.js",
-    "vibecli-mcp-server": "dist/mcp/stdio-server.js",
+    "vibecli-mcp-server": "dist/mcp/mcp-server.js",
     "vibecli-http-server": "dist/mcp-server.js"
   },
   "scripts": {
@@ -64,6 +64,7 @@
   },
   "homepage": "https://github.com/vibetemplate/vibecli#readme",
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.13.2",
     "chalk": "^5.3.0",
     "commander": "^11.1.0",
     "execa": "^8.0.1",
@@ -72,7 +73,8 @@
     "mustache": "^4.2.0",
     "ora": "^7.0.1",
     "semver": "^7.5.4",
-    "validate-npm-package-name": "^5.0.0"
+    "validate-npm-package-name": "^5.0.0",
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
