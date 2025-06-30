@@ -27,7 +27,7 @@ export interface ProjectResult {
 }
 
 export interface FeatureConfig {
-  name: 'auth' | 'crud' | 'upload' | 'email' | 'payment' | 'realtime'
+  name: 'auth' | 'crud' | 'upload' | 'email' | 'payment' | 'realtime' | 'admin' | 'analytics'
   options?: Record<string, any>
   force?: boolean
 }
