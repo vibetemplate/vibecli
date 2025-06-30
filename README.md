@@ -36,12 +36,15 @@ VibeCLI v1.2.0 新增了对 Model Context Protocol (MCP) 的完整支持，提�
 
 #### NPM 全局安装
 ```bash
-npm install -g vibe-cli-tool
+npm install -g vibe-cli-tool@latest
 ```
+
+> **当前版本**: v1.2.6  
+> **包地址**: https://www.npmjs.com/package/vibe-cli-tool
 
 #### NPX 临时使用
 ```bash
-npx vibe-cli-tool mcp:server
+npx --package=vibe-cli-tool@latest vibecli-mcp-server
 ```
 
 #### 从源码安装
@@ -50,7 +53,7 @@ git clone https://github.com/vibetemplate/vibecli.git
 cd vibecli
 npm install
 npm run build
-npm run mcp:server
+npm run mcp:dev
 ```
 
 ### 🚀 MCP 快速开始
@@ -58,26 +61,28 @@ npm run mcp:server
 #### 1. 启动 MCP 服务器
 
 ```bash
-# 使用默认端口 9529
+# 全局安装后直接使用
 vibecli-mcp-server
 
-# 或指定端口
-VIBECLI_MCP_PORT=9530 vibecli-mcp-server
+# 或使用 npx 临时运行
+npx --package=vibe-cli-tool@latest vibecli-mcp-server
+
+# 调试模式
+npx --package=vibe-cli-tool@latest vibecli-mcp-server --debug
 ```
 
 #### 2. 配置 MCP 客户端
 
 **Cursor 配置**
 
-在 Cursor 设置中添加：
+在 Cursor 的 `.cursor/mcp.json` 文件中添加：
 ```json
 {
   "mcpServers": {
     "vibecli": {
       "command": "npx",
-      "args": ["-y", "vibe-cli-tool", "mcp:server"],
+      "args": ["-y", "--package=vibe-cli-tool@latest", "vibecli-mcp-server"],
       "env": {
-        "VIBECLI_MCP_PORT": "9529",
         "NODE_ENV": "production"
       }
     }
@@ -92,9 +97,9 @@ VIBECLI_MCP_PORT=9530 vibecli-mcp-server
 {
   "mcpServers": {
     "vibecli": {
-      "command": "vibecli-mcp-server",
+      "command": "npx",
+      "args": ["-y", "--package=vibe-cli-tool@latest", "vibecli-mcp-server"],
       "env": {
-        "VIBECLI_MCP_PORT": "9529",
         "NODE_ENV": "production"
       }
     }
@@ -111,10 +116,10 @@ VIBECLI_MCP_PORT=9530 vibecli-mcp-server
     {
       "name": "vibecli",
       "command": "npx",
-      "args": ["vibe-cli-tool", "mcp:server"],
+      "args": ["-y", "--package=vibe-cli-tool@latest", "vibecli-mcp-server"],
       "cwd": "${workspaceFolder}",
       "env": {
-        "VIBECLI_MCP_PORT": "3001"
+        "NODE_ENV": "production"
       }
     }
   ]
@@ -171,6 +176,21 @@ VibeCLI MCP 支持智能会话管理：
 - 支持会话级别的访问控制
 - 所有文件操作都有权限验证
 - 生成的项目代码遵循安全最佳实践
+
+### 🔗 MCP 命令行使用
+
+除了在 AI 客户端中使用，你也可以直接通过命令行测试 MCP 功能：
+
+```bash
+# 测试 MCP 服务器是否正常启动
+npx --package=vibe-cli-tool@latest vibecli-mcp-server --help
+
+# 查看版本信息
+npx --package=vibe-cli-tool@latest vibecli-mcp-server --version
+
+# 启用调试模式查看详细日志
+npx --package=vibe-cli-tool@latest vibecli-mcp-server --debug
+```
 
 ### 💡 MCP 使用示例
 
