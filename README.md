@@ -210,6 +210,165 @@ npx --package=vibe-cli-tool@latest vibecli-mcp-server --debug
 - ⚠️ **风险评估**: 识别潜在风险并提供缓解方案
 - 🔄 **替代方案**: 提供多个可选的技术栈组合
 
+### 🎯 MCP 提示词使用指南
+
+一旦配置完成 MCP 客户端，你可以使用 `@vibecli` 前缀来唤醒 VibeCLI MCP 服务器。以下是一些实用的提示词示例：
+
+#### 🏗️ 项目创建提示词
+
+```
+@vibecli 帮我创建一个电商网站，需要包含：
+- 用户注册和登录功能
+- 商品展示和购买功能
+- 购物车和订单管理
+- 管理员后台管理
+- 支付集成（Stripe）
+项目名称：my-ecommerce-store
+```
+
+```
+@vibecli create a new SaaS project with:
+- User authentication and subscription management
+- Dashboard with analytics
+- Stripe payment integration
+- Email notifications
+- Admin panel
+Project name: my-saas-app
+```
+
+#### ⚡ 功能添加提示词
+
+```
+@vibecli 为我的项目 /path/to/my-project 添加以下功能：
+- JWT 认证系统
+- 用户个人资料管理
+- 密码重置功能
+- 邮箱验证
+```
+
+```
+@vibecli add real-time chat feature to my project at /path/to/my-project:
+- WebSocket integration
+- Message history
+- User online status
+- File sharing capability
+```
+
+#### 🔧 代码生成提示词
+
+```
+@vibecli 为我的项目生成以下 API 端点：
+- POST /api/users - 创建用户
+- GET /api/users - 获取用户列表
+- PUT /api/users/:id - 更新用户信息
+- DELETE /api/users/:id - 删除用户
+包含完整的 TypeScript 类型定义和 Zod 验证
+```
+
+```
+@vibecli generate a complete product management system:
+- Product model with Prisma schema
+- CRUD API routes
+- React components for product listing
+- Admin forms for product management
+- Image upload functionality
+```
+
+#### 🚀 部署相关提示词
+
+```
+@vibecli 帮我将项目 /path/to/my-project 部署到：
+- 平台：Vercel
+- 环境：生产环境
+- 域名：my-awesome-app.com
+- 数据库：PostgreSQL
+- 环境变量自动配置
+```
+
+```
+@vibecli deploy my project to AWS with:
+- Docker containerization
+- RDS PostgreSQL database
+- S3 for file storage
+- CloudFront CDN
+- SSL certificate setup
+```
+
+#### 🔍 项目分析提示词
+
+```
+@vibecli 分析我的项目 /path/to/my-project 并提供：
+- 代码质量评估
+- 性能优化建议
+- 安全性检查
+- 架构改进建议
+- 依赖更新建议
+```
+
+```
+@vibecli analyze my project structure and recommend:
+- Better folder organization
+- Code splitting strategies
+- Performance optimizations
+- Security improvements
+- Testing strategies
+```
+
+#### 💡 智能问答提示词
+
+```
+@vibecli 我想在我的 Next.js 项目中实现：
+- 用户权限管理系统
+- 基于角色的访问控制
+- 请推荐最佳实践和实现方案
+```
+
+```
+@vibecli what's the best way to implement:
+- Real-time notifications
+- File upload with progress
+- Advanced search functionality
+- Multi-language support
+in a Next.js application?
+```
+
+#### 🎨 模板定制提示词
+
+```
+@vibecli 基于我的需求定制一个模板：
+- 行业：在线教育
+- 功能：课程管理、学生管理、在线支付、视频播放
+- 风格：现代简约
+- 颜色主题：蓝色系
+```
+
+```
+@vibecli customize a template for my startup:
+- Industry: Fintech
+- Features: User onboarding, KYC verification, transaction tracking
+- Design: Professional corporate style
+- Compliance: GDPR, PCI DSS
+```
+
+#### 📱 移动端适配提示词
+
+```
+@vibecli 为我的项目添加移动端支持：
+- 响应式设计
+- PWA 功能
+- 移动端专用组件
+- 触摸手势支持
+- 离线功能
+```
+
+### 🎪 MCP 互动技巧
+
+1. **具体描述需求**：提供详细的功能需求和技术要求
+2. **指定路径**：明确项目路径和文件位置
+3. **分步骤操作**：复杂功能可以分步骤实现
+4. **利用上下文**：VibeCLI 会记住对话上下文，可以进行连续操作
+5. **验证结果**：生成代码后可以要求解释和验证
+
 ## AI 工具提示词模板
 
 像 Claude Code 这样的 AI 工具在提供适当上下文时，特别擅长构建全栈应用。当提示 AI 编程工具构建或扩展 Web 应用时，请简要说明你的需求，然后将以下上下文添加到你的指令中。
