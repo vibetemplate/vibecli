@@ -1,0 +1,67 @@
+{
+  "name": "auth-system",
+  "displayName": "认证系统模板",
+  "description": "包含完整认证系统的Next.js项目模板",
+  "version": "1.0.0",
+  "author": "VibeCLI Team",
+  "features": ["auth", "typescript", "tailwindcss", "prisma"],
+  "requirements": {
+    "node": ">=18.17.0",
+    "npm": ">=9.0.0"
+  },
+  "supportedDatabases": ["postgresql", "mysql", "sqlite"],
+  "defaultDatabase": "postgresql",
+  "variables": {
+    "projectName": {
+      "type": "string",
+      "description": "项目名称",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "description": "项目描述", 
+      "default": "基于VibeCLI创建的Next.js认证系统"
+    },
+    "version": {
+      "type": "string",
+      "description": "项目版本",
+      "default": "0.1.0"
+    },
+    "databaseProvider": {
+      "type": "string",
+      "description": "数据库类型",
+      "enum": ["postgresql", "mysql", "sqlite"],
+      "default": "postgresql"
+    },
+    "databaseUrl": {
+      "type": "string",
+      "description": "数据库连接URL",
+      "default": "postgresql://username:password@localhost:5432/database_name"
+    },
+    "jwtSecret": {
+      "type": "string",
+      "description": "JWT访问令牌密钥",
+      "generate": "random",
+      "length": 64
+    },
+    "jwtRefreshSecret": {
+      "type": "string", 
+      "description": "JWT刷新令牌密钥",
+      "generate": "random",
+      "length": 64
+    },
+    "nextAuthSecret": {
+      "type": "string",
+      "description": "NextAuth密钥",
+      "generate": "random",
+      "length": 32
+    }
+  },
+  "postInstall": [
+    "npm install",
+    "npx prisma generate",
+    "echo '✅ 认证系统模板创建完成！'",
+    "echo '📝 请配置 .env.local 文件中的数据库连接',
+    "echo '🚀 运行 npm run dev 启动开发服务器'"
+  ]
+}

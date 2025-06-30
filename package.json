@@ -2,12 +2,14 @@
   "name": "vibe-cli-tool",
   "version": "1.1.1",
   "description": "快速创建现代化Web全栈应用的CLI工具",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
     "vibecli": "dist/cli.js",
     "vibe": "dist/cli.js",
-    "create-vibe-app": "dist/cli.js"
+    "create-vibe-app": "dist/cli.js",
+    "vibecli-mcp-server": "dist/mcp-server.js"
   },
   "scripts": {
     "build": "tsc",
@@ -20,7 +22,9 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write src/**/*.ts",
     "format:check": "prettier --check src/**/*.ts",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "mcp:server": "node dist/mcp-server.js",
+    "mcp:dev": "tsc && npm run mcp:server"
   },
   "keywords": [
     "web",

@@ -2,10 +2,10 @@
 
 import { Command } from 'commander'
 import chalk from 'chalk'
-import { createApp } from './commands/create'
-import { addFeature } from './commands/add'
-import { deployApp } from './commands/deploy'
-import { generateApi } from './commands/generate'
+import { createApp } from './commands/create.js'
+import { addFeature } from './commands/add.js'
+import { deployApp } from './commands/deploy.js'
+import { generateApi } from './commands/generate.js'
 
 const program = new Command()
 
@@ -20,6 +20,7 @@ program
   .description('创建新的Web全栈应用')
   .option('-t, --template <template>', '选择项目模板', 'default')
   .option('-d, --database <database>', '选择数据库类型', 'postgresql')
+  .option('-f, --force', '强制覆盖现有目录')
   .option('--no-auth', '不包含认证系统')
   .option('--no-admin', '不包含管理面板')
   .action(createApp)

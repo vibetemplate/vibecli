@@ -1,102 +1,95 @@
 import inquirer from 'inquirer'
 import chalk from 'chalk'
 import ora from 'ora'
-import fs from 'fs-extra'
-import path from 'path'
-import { generateFeature, FEATURES } from '../utils/feature-generator'
+import { VibeCLICore } from '../core/vibecli-core.js'
+import { FeatureConfig } from '../core/types.js'
 
 interface AddOptions {
   force?: boolean
 }
 
-// 使用从 feature-generator 导入的 FEATURES
+const AVAILABLE_FEATURES = {
+  auth: { name: '用户认证系统', description: '完整的用户注册、登录、权限管理' },
+  crud: { name: 'CRUD操作', description: '数据增删改查操作' },
+  upload: { name: '文件上传', description: '多文件上传和存储管理' },
+  email: { name: '邮件系统', description: '邮件发送和模板管理' },
+  payment: { name: '支付集成', description: 'Stripe等支付平台集成' },
+  realtime: { name: '实时通信', description: 'WebSocket实时功能' }
+}
 
 export async function addFeature(featureName: string, options: AddOptions) {
   console.log(chalk.blue.bold('\n📦 添加功能模块\n'))
 
-  // 检查是否在项目根目录
-  if (!fs.existsSync('package.json')) {
-    console.error(chalk.red('❌ 请在项目根目录下运行此命令'))
-    process.exit(1)
-  }
+  const core = new VibeCLICore()
 
-  // 检查功能是否存在
-  if (!FEATURES[featureName.toLowerCase()]) {
-    console.log(chalk.yellow('❓ 可用的功能模块:'))
-    Object.entries(FEATURES).forEach(([key, feature]) => {
-      console.log(`  ${chalk.cyan(key)}: ${feature.name}`)
-    })
-    process.exit(1)
-  }
-
-  const feature = FEATURES[featureName.toLowerCase()]
-
-  // 显示功能信息
-  console.log(chalk.blue(`功能: ${feature.name}`))
-  console.log(chalk.gray(`文件: ${feature.files.join(', ')}\n`))
-
-  // 检查文件冲突
-  const conflicts = await checkFileConflicts(feature.files)
-  if (conflicts.length > 0 && !options.force) {
-    console.log(chalk.yellow('⚠️  发现文件冲突:'))
-    conflicts.forEach(file => console.log(`  ${file}`))
-    
-    const { proceed } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'proceed',
-        message: '是否覆盖现有文件？',
-        default: false
-      }
-    ])
-
-    if (!proceed) {
-      console.log(chalk.yellow('❌ 操作已取消'))
-      process.exit(0)
-    }
-  }
-
-  // 生成功能
-  const spinner = ora(`正在添加 ${feature.name}...`).start()
-  
   try {
-    await generateFeature(featureName.toLowerCase(), process.cwd(), options.force)
-    
-    spinner.succeed(`${feature.name} 添加成功!`)
-
-    // 显示后续步骤
-    console.log(chalk.green.bold('\n✅ 功能添加完成!\n'))
-    console.log(chalk.blue('下一步操作:'))
-    
-    if (featureName === 'auth') {
-      console.log('  1. 配置环境变量 (.env.local)')
-      console.log('  2. 运行数据库迁移: npx prisma migrate dev')
-      console.log('  3. 访问 /login 页面测试登录功能')
-    } else if (featureName === 'upload') {
-      console.log('  1. 配置云存储服务 (Cloudflare R2/AWS S3)')
-      console.log('  2. 设置环境变量')
-      console.log('  3. 测试文件上传功能')
+    // 验证功能名称
+    if (!AVAILABLE_FEATURES[featureName.toLowerCase() as keyof typeof AVAILABLE_FEATURES]) {
+      console.log(chalk.yellow('❓ 可用的功能模块:'))
+      Object.entries(AVAILABLE_FEATURES).forEach(([key, feature]) => {
+        console.log(`  ${chalk.cyan(key)}: ${feature.name} - ${chalk.gray(feature.description)}`)
+      })
+      process.exit(1)
     }
 
-    console.log('')
+    const feature = AVAILABLE_FEATURES[featureName.toLowerCase() as keyof typeof AVAILABLE_FEATURES]
+    console.log(chalk.blue(`功能: ${feature.name}`))
+    console.log(chalk.gray(`${feature.description}\n`))
+
+    // 获取功能配置
+    const featureConfig = await promptForFeatureConfig(featureName.toLowerCase())
+
+    // 使用核心API添加功能
+    const spinner = ora(`正在添加 ${feature.name}...`).start()
+    
+    const result = await core.addFeature(process.cwd(), {
+      name: featureName.toLowerCase() as any,
+      options: featureConfig,
+      force: options.force
+    })
+    
+    if (result.success) {
+      spinner.succeed(`${feature.name} 添加成功!`)
+      
+      // 显示生成的文件
+      console.log(chalk.green.bold('\n✅ 功能添加完成!\n'))
+      if (result.addedFiles.length > 0) {
+        console.log(chalk.blue('新增文件:'))
+        result.addedFiles.forEach(file => {
+          console.log(`  ✓ ${file}`)
+        })
+      }
+      
+      if (result.modifiedFiles.length > 0) {
+        console.log(chalk.blue('\n修改文件:'))
+        result.modifiedFiles.forEach(file => {
+          console.log(`  ✓ ${file}`)
+        })
+      }
+      
+      // 显示后续步骤
+      if (result.instructions.length > 0) {
+        console.log(chalk.blue('\n下一步操作:'))
+        result.instructions.forEach((instruction, index) => {
+          console.log(`  ${index + 1}. ${instruction}`)
+        })
+      }
+      
+      console.log('')
+    } else {
+      spinner.fail('功能添加失败')
+      console.error(chalk.red('❌ ' + result.message))
+      if (result.error) {
+        console.error(chalk.red('详细错误: ' + result.error))
+      }
+      process.exit(1)
+    }
 
   } catch (error) {
-    spinner.fail('功能添加失败')
-    console.error(chalk.red(error))
+    console.error(chalk.red('❌ 添加功能时发生错误:'))
+    console.error(chalk.red(error instanceof Error ? error.message : String(error)))
     process.exit(1)
   }
-}
-
-async function checkFileConflicts(files: string[]): Promise<string[]> {
-  const conflicts: string[] = []
-  
-  for (const file of files) {
-    if (await fs.pathExists(file)) {
-      conflicts.push(file)
-    }
-  }
-  
-  return conflicts
 }
 
 async function promptForFeatureConfig(featureName: string) {
@@ -178,44 +171,4 @@ async function promptForFeatureConfig(featureName: string) {
   }
 
   return await inquirer.prompt(questions)
-}
-
-async function updatePackageDependencies(featureName: string) {
-  const packageJsonPath = 'package.json'
-  const packageJson = await fs.readJson(packageJsonPath)
-
-  const dependencies: Record<string, Record<string, string>> = {
-    auth: {
-      'bcryptjs': '^2.4.3',
-      'jsonwebtoken': '^9.0.0',
-      '@types/bcryptjs': '^2.4.2',
-      '@types/jsonwebtoken': '^9.0.1'
-    },
-    upload: {
-      'multer': '^1.4.5',
-      'sharp': '^0.32.0',
-      '@aws-sdk/client-s3': '^3.0.0'
-    },
-    payment: {
-      'stripe': '^12.0.0'
-    },
-    email: {
-      'nodemailer': '^6.9.0',
-      '@types/nodemailer': '^6.4.7'
-    },
-    realtime: {
-      'socket.io': '^4.7.0',
-      'socket.io-client': '^4.7.0'
-    }
-  }
-
-  const featureDeps = dependencies[featureName]
-  if (featureDeps) {
-    packageJson.dependencies = {
-      ...packageJson.dependencies,
-      ...featureDeps
-    }
-
-    await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 })
-  }
 }

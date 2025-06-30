@@ -1,0 +1,139 @@
+# {{projectName}}
+
+{{description}}
+
+基于VibeCLI创建的Next.js项目，包含完整的认证系统。
+
+## 功能特性
+
+✨ **认证系统**
+- 用户注册和登录
+- JWT令牌管理和自动刷新
+- 邮箱验证
+- 密码重置
+- 会话管理
+- 角色权限控制
+
+🔒 **安全特性**
+- bcrypt密码加密
+- JWT令牌安全
+- CORS配置
+- 输入验证
+- 乐观锁防并发
+
+🎨 **现代化技术栈**
+- Next.js 14
+- TypeScript
+- Tailwind CSS
+- Prisma ORM
+- {{databaseProvider}} 数据库
+
+## 快速开始
+
+### 1. 安装依赖
+
+```bash
+npm install
+```
+
+### 2. 配置环境变量
+
+复制环境变量模板：
+
+```bash
+cp .env.example .env.local
+```
+
+编辑 `.env.local` 文件，配置数据库连接和JWT密钥。
+
+### 3. 设置数据库
+
+```bash
+# 生成Prisma客户端
+npm run db:generate
+
+# 运行数据库迁移
+npm run db:migrate
+
+# (可选) 打开数据库管理界面
+npm run db:studio
+```
+
+### 4. 启动开发服务器
+
+```bash
+npm run dev
+```
+
+访问 [http://localhost:3000](http://localhost:3000) 查看应用。
+
+## 项目结构
+
+```
+{{projectName}}/
+├── components/          # React组件
+│   ├── auth/           # 认证相关组件
+│   └── ui/             # 通用UI组件
+├── lib/                # 工具函数和服务
+│   ├── services/       # 业务逻辑
+│   ├── middleware/     # 中间件
+│   ├── utils/          # 工具函数
+│   └── validations/    # 数据验证
+├── pages/              # Next.js页面
+│   ├── api/            # API路由
+│   └── auth/           # 认证页面
+├── prisma/             # 数据库配置
+├── types/              # TypeScript类型定义
+└── styles/             # 样式文件
+```
+
+## API端点
+
+### 认证相关
+
+- `POST /api/auth/register` - 用户注册
+- `POST /api/auth/login` - 用户登录
+- `POST /api/auth/logout` - 用户登出
+- `POST /api/auth/refresh` - 刷新令牌
+- `POST /api/auth/reset-password` - 密码重置
+- `POST /api/auth/change-password` - 修改密码
+- `POST /api/auth/verify-email` - 邮箱验证
+- `GET /api/auth/profile` - 获取用户信息
+- `PUT /api/auth/profile` - 更新用户信息
+
+## 开发命令
+
+```bash
+npm run dev          # 启动开发服务器
+npm run build        # 构建生产版本
+npm run start        # 启动生产服务器
+npm run lint         # 代码检查
+npm run type-check   # TypeScript类型检查
+npm run test         # 运行测试
+```
+
+## 数据库命令
+
+```bash
+npm run db:generate  # 生成Prisma客户端
+npm run db:migrate   # 运行数据库迁移
+npm run db:push      # 推送schema到数据库
+npm run db:reset     # 重置数据库
+npm run db:studio    # 打开数据库管理界面
+```
+
+## 贡献
+
+1. Fork 项目
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
+
+## 许可证
+
+MIT License - 详见 [LICENSE](LICENSE) 文件
+
+---
+
+通过 [VibeCLI](https://github.com/vibetemplate/vibecli) 创建 ⚡
