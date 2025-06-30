@@ -28,6 +28,168 @@ npm install -g vibe-cli-tool
 
 完整示例和文档请查看 [examples/](./examples/) 目录，详细架构信息请参考 [ARCHITECTURE.md](ARCHITECTURE.md)。
 
+## 🤖 MCP 协议集成 (AI 智能助手)
+
+VibeCLI v1.2.0 新增了对 Model Context Protocol (MCP) 的完整支持，提供AI驱动的智能项目分析和生成能力。通过MCP协议，你可以在支持的AI客户端中直接使用VibeCLI的智能功能。
+
+### 📦 MCP 安装
+
+#### NPM 全局安装
+```bash
+npm install -g vibe-cli-tool
+```
+
+#### NPX 临时使用
+```bash
+npx vibe-cli-tool mcp:server
+```
+
+#### 从源码安装
+```bash
+git clone https://github.com/vibetemplate/vibecli.git
+cd vibecli
+npm install
+npm run build
+npm run mcp:server
+```
+
+### 🚀 MCP 快速开始
+
+#### 1. 启动 MCP 服务器
+
+```bash
+# 使用默认端口 3001
+vibecli-mcp-server
+
+# 或指定端口
+VIBECLI_MCP_PORT=3002 vibecli-mcp-server
+```
+
+#### 2. 配置 MCP 客户端
+
+**Cursor 配置**
+
+在 Cursor 设置中添加：
+```json
+{
+  "mcpServers": {
+    "vibecli": {
+      "command": "npx",
+      "args": ["-y", "vibe-cli-tool", "mcp:server"],
+      "env": {
+        "VIBECLI_MCP_PORT": "3001",
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}
+```
+
+**Claude Desktop 配置**
+
+在 Claude Desktop 配置文件中添加：
+```json
+{
+  "mcpServers": {
+    "vibecli": {
+      "command": "vibecli-mcp-server",
+      "env": {
+        "VIBECLI_MCP_PORT": "3001",
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}
+```
+
+**VS Code 配置**
+
+对于支持MCP的VS Code扩展：
+```json
+{
+  "mcp.servers": [
+    {
+      "name": "vibecli",
+      "command": "npx",
+      "args": ["vibe-cli-tool", "mcp:server"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "VIBECLI_MCP_PORT": "3001"
+      }
+    }
+  ]
+}
+```
+
+#### 3. MCP 工具使用
+
+一旦配置完成，你就可以在AI客户端中使用以下VibeCLI MCP工具：
+
+**🎯 project_analyzer** - 智能项目分析
+```
+请帮我分析一个电商网站项目，需要包含用户认证、商品管理、购物车和支付功能，团队规模2人，预算中等，时间要求正常。
+```
+
+**🏗️ template_generator** - 智能模板生成
+```
+基于刚才的分析结果，请生成完整的项目模板到 /path/to/my-ecommerce-site 目录。
+```
+
+**⚡ feature_composer** - 功能模块组合
+```
+为我的项目 /path/to/project 添加 JWT 认证功能，包含邮箱验证。
+```
+
+**🚀 deployment_manager** - 部署管理
+```
+帮我将项目部署到 Vercel，环境设置为生产环境，自定义域名为 my-awesome-app.com。
+```
+
+### 🔧 MCP 高级配置
+
+#### 服务器配置选项
+
+```bash
+# 环境变量配置
+export VIBECLI_MCP_PORT=3001          # MCP服务器端口
+export VIBECLI_LOG_LEVEL=info         # 日志级别
+export VIBECLI_SESSION_TIMEOUT=1800   # 会话超时时间(秒)
+export VIBECLI_MAX_PROJECTS=50        # 最大并发项目数
+```
+
+#### 会话管理
+
+VibeCLI MCP 支持智能会话管理：
+- **断线重连**: 自动恢复中断的任务
+- **任务状态**: 实时跟踪项目生成进度 
+- **事件重播**: 重连时恢复丢失的进度信息
+- **并发支持**: 同时处理多个项目分析和生成
+
+#### 安全考虑
+
+- MCP服务器默认只监听本地连接
+- 支持会话级别的访问控制
+- 所有文件操作都有权限验证
+- 生成的项目代码遵循安全最佳实践
+
+### 💡 MCP 使用示例
+
+**完整项目生成流程**:
+```
+1. AI客户端: "我想创建一个SaaS项目，包含用户订阅、支付和数据分析功能"
+2. VibeCLI分析: 智能识别为SaaS类型，推荐Next.js + PostgreSQL + Stripe技术栈
+3. 生成项目: 自动创建完整的模板代码、数据库模式和配置文件
+4. 添加功能: 逐步添加认证、支付、分析等功能模块
+5. 部署上线: 自动配置部署到Vercel或其他平台
+```
+
+**AI智能决策展示**:
+- 🧠 **项目类型识别**: 基于自然语言描述自动识别项目类型
+- 📊 **复杂度评估**: 智能评估项目复杂度和开发时间
+- 🏗️ **架构推荐**: 根据约束条件推荐最适合的技术架构
+- ⚠️ **风险评估**: 识别潜在风险并提供缓解方案
+- 🔄 **替代方案**: 提供多个可选的技术栈组合
+
 ## AI 工具提示词模板
 
 像 Claude Code 这样的 AI 工具在提供适当上下文时，特别擅长构建全栈应用。当提示 AI 编程工具构建或扩展 Web 应用时，请简要说明你的需求，然后将以下上下文添加到你的指令中。
