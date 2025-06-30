@@ -39,7 +39,7 @@ VibeCLI v1.2.0 新增了对 Model Context Protocol (MCP) 的完整支持，提�
 npm install -g vibe-cli-tool@latest
 ```
 
-> **当前版本**: v1.2.7  
+> **当前版本**: v1.2.8  
 > **包地址**: https://www.npmjs.com/package/vibe-cli-tool
 
 #### NPX 临时使用
