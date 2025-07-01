@@ -706,8 +706,8 @@ export default function RootLayout({
   private generatePageFile(config: ProjectConfig): string {
     return `export default function Home() {
   return (
-    <main className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-center mb-8">
+    <main className="container px-4 py-8 mx-auto">
+      <h1 className="mb-8 text-4xl font-bold text-center">
         欢迎使用 ${config.name}
       </h1>
       <p className="text-center text-gray-600">
@@ -907,36 +907,74 @@ module.exports = {
   }
 
   private async copyAndRenderTemplate(templatePath: string, projectPath: string, variables: any): Promise<void> {
-    await fs.ensureDir(projectPath)
-    
-    const templateFiles = await this.getAllFiles(templatePath)
-    
-    for (const filePath of templateFiles) {
-      const relativePath = path.relative(templatePath, filePath)
-      const targetPath = path.join(projectPath, relativePath)
+    try {
+      await fs.ensureDir(projectPath)
       
-      // 跳过template.json配置文件
-      if (path.basename(filePath) === 'template.json') {
-        continue
+      // 验证模板路径存在
+      if (!await fs.pathExists(templatePath)) {
+        throw new Error(`模板路径不存在: ${templatePath}`)
       }
       
-      // 确保目标目录存在
-      await fs.ensureDir(path.dirname(targetPath))
+      const templateFiles = await this.getAllFiles(templatePath)
+      console.log(`找到 ${templateFiles.length} 个模板文件`)
       
-      if (filePath.endsWith('.mustache')) {
-        // 渲染模板文件
-        const template = await fs.readFile(filePath, 'utf-8')
-        // 禁用HTML转义
-        const rendered = Mustache.render(template, variables, {}, { escape: (text) => text })
-        
-        // 移除.mustache扩展名
-        const finalPath = targetPath.replace('.mustache', '')
-        await fs.writeFile(finalPath, rendered)
-      } else {
-        // 直接复制非模板文件
-        await fs.copy(filePath, targetPath)
+      for (const filePath of templateFiles) {
+        try {
+          const relativePath = path.relative(templatePath, filePath)
+          
+          // 跳过template.json配置文件和其他不需要的文件
+          if (path.basename(filePath) === 'template.json' || 
+              path.basename(filePath) === '.DS_Store' ||
+              path.basename(filePath).startsWith('.git')) {
+            continue
+          }
+          
+          let targetPath = path.join(projectPath, relativePath)
+          
+          // 确保目标目录存在
+          await fs.ensureDir(path.dirname(targetPath))
+          
+          if (filePath.endsWith('.mustache')) {
+            // 渲染模板文件
+            const template = await fs.readFile(filePath, 'utf-8')
+            
+            // 使用更安全的模板渲染
+            let rendered: string
+            try {
+              // 禁用HTML转义，支持代码模板
+              rendered = Mustache.render(template, variables, {}, { 
+                escape: (text) => text,
+                tags: ['{{', '}}'] 
+              })
+            } catch (renderError) {
+              console.warn(`模板渲染警告 ${relativePath}:`, renderError)
+              // 如果模板渲染失败，使用原始内容
+              rendered = template
+            }
+            
+            // 移除.mustache扩展名
+            targetPath = targetPath.replace('.mustache', '')
+            await fs.writeFile(targetPath, rendered, 'utf-8')
+            console.log(`✓ 渲染模板: ${relativePath}`)
+            
+          } else {
+            // 直接复制非模板文件
+            await fs.copy(filePath, targetPath)
+            console.log(`✓ 复制文件: ${relativePath}`)
+          }
+          
+        } catch (fileError) {
+          console.error(`处理文件失败 ${filePath}:`, fileError)
+          // 继续处理其他文件，不中断整个流程
+        }
       }
-    }
+      
+      console.log('✅ 模板文件处理完成')
+      
+         } catch (error: any) {
+       console.error('模板复制和渲染失败:', error)
+       throw new Error(`模板处理失败: ${error?.message || '未知错误'}`)
+     }
   }
 
   private async getAllFiles(dirPath: string): Promise<string[]> {

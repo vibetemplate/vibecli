@@ -13,18 +13,43 @@ import { z } from 'zod';
 import { Command } from 'commander';
 import os from 'os';
 import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import { VibeCLICore } from '../core/vibecli-core.js';
 import { promptTemplateEngine } from '../prompts/dynamic/template-engine.js';
 import { mcpContextManager } from './mcp-context-manager.js';
 import { intentAnalyzer } from '../prompts/dynamic/intent-analyzer.js';
 import type { ProjectConfig, PromptGenerationConfig, PromptContext } from '../core/types.js';
 
+// 获取包版本
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+function getPackageVersion(): string {
+  try {
+    // 向上查找package.json
+    let currentDir = __dirname;
+    while (currentDir !== path.dirname(currentDir)) {
+      const packagePath = path.join(currentDir, 'package.json');
+      if (fs.existsSync(packagePath)) {
+        const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
+        return packageJson.version;
+      }
+      currentDir = path.dirname(currentDir);
+    }
+    return '1.5.4'; // 默认版本
+  } catch {
+    return '1.5.4'; // 默认版本
+  }
+}
+
 // 解析命令行参数
 const program = new Command();
+const version = getPackageVersion();
 program
   .name('vibecli-mcp-server')
   .description('VibeCLI MCP服务器 - AI驱动的Web全栈应用CLI工具')
-  .version('1.5.4')
+  .version(version)
   .option('--debug', '启用调试模式')
   .option('--no-telemetry', '禁用遥测')
   .parse();
@@ -34,7 +59,7 @@ const options = program.opts();
 // 创建MCP服务器
 const server = new McpServer({
   name: 'vibecli-mcp',
-  version: '1.5.4'
+  version: version
 });
 
 // 初始化核心组件
