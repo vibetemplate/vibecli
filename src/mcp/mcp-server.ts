@@ -13,34 +13,17 @@ import { z } from 'zod';
 import { Command } from 'commander';
 import os from 'os';
 import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
+
 import { VibeCLICore } from '../core/vibecli-core.js';
 import { promptTemplateEngine } from '../prompts/dynamic/template-engine.js';
 import { mcpContextManager } from './mcp-context-manager.js';
 import { intentAnalyzer } from '../prompts/dynamic/intent-analyzer.js';
 import type { ProjectConfig, PromptGenerationConfig, PromptContext } from '../core/types.js';
 
-// 获取包版本
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
+// 获取包版本 - 简化版本，避免动态文件读取问题
 function getPackageVersion(): string {
-  try {
-    // 向上查找package.json
-    let currentDir = __dirname;
-    while (currentDir !== path.dirname(currentDir)) {
-      const packagePath = path.join(currentDir, 'package.json');
-      if (fs.existsSync(packagePath)) {
-        const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
-        return packageJson.version;
-      }
-      currentDir = path.dirname(currentDir);
-    }
-    return '1.5.4'; // 默认版本
-  } catch {
-    return '1.5.4'; // 默认版本
-  }
+  // 使用固定版本，避免在NPX环境中动态读取文件的问题
+  return '1.5.7';
 }
 
 // 解析命令行参数
