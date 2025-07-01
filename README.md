@@ -1,50 +1,69 @@
-# VibeCLI - 现代化 Web 全栈应用 CLI 工具
+# VibeCLI v1.3.0 - MCP智能提示词生成系统
 
-VibeCLI 是一个强大的命令行工具，用于快速创建现代化、生产就绪的 Web 全栈应用程序。它基于 Next.js、TypeScript、Prisma 和行业最佳实践，提供了一个有主见但灵活的开发基础。
+VibeCLI 是一个AI驱动的命令行工具，通过**Model Context Protocol (MCP)**协议提供智能项目分析和代码生成能力。它基于 Next.js、TypeScript、Prisma 和行业最佳实践，结合多轮对话上下文进行智能匹配，为开发者提供个性化的Web全栈应用开发体验。
 
-本仓库提供三个核心组件：用于快速搭建应用的 CLI 工具、用于添加常用功能的特性生成器，以及构建可扩展 Web 应用的全面文档。
+## 🎯 v1.3.0 核心特性
 
-- 对于构建现代 Web 应用的开发者，我们旨在消除样板代码并加速开发
-- 对于采用全栈 TypeScript 的团队，我们提供经过实战验证的模式和配置
+- **🧠 MCP智能上下文管理** - 通过多轮对话渐进式理解用户意图
+- **🎨 智能模板匹配** - 基于对话上下文自动选择最适合的提示词模板  
+- **📊 上下文感知置信度计算** - 动态评估理解程度并提供澄清建议
+- **💾 会话状态管理** - 支持跨对话轮次的项目信息累积
+- **🔍 智能特征提取** - 自动识别项目类型、技术偏好和复杂度
 
-VibeCLI 生成的应用自带身份验证、数据库集成、API 设计模式和部署配置。我们专注于开发者体验，同时保持生产级的代码质量、安全性和性能。
+VibeCLI v1.3 不再依赖外部AI服务，而是**使用MCP协议的原生上下文能力**进行智能分析和决策，确保隐私安全的同时提供卓越的开发体验。
 
 ## 开发者指南
 
 VibeCLI 的核心是创建完整的 Next.js 应用，预配置了 TypeScript、Prisma ORM、身份验证系统和现代 UI 组件。入门很简单：安装 CLI，运行一个命令，你就有了一个准备好开发的全栈应用。
 
-安装 CLI 工具：
+## 🚀 快速开始
+
+### 安装 VibeCLI v1.3.0
 
 ```bash
-npm install -g vibe-cli-tool
+# 全局安装最新版本
+npm install -g vibe-cli-tool@1.3.0
+
+# 启动MCP智能提示词生成服务器
+vibecli-mcp-server
 ```
 
-基本使用流程：
+### 基本使用流程
 
-1. 运行 `vibecli create my-app` 通过交互式配置创建新应用
-2. 运行 `vibecli add auth` 为现有项目添加身份验证功能
-3. 运行 `vibecli generate api users` 生成 API 端点和相关代码
-4. 运行 `vibecli deploy` 将应用部署到云平台
+1. **启动MCP服务器**: `vibecli-mcp-server` 
+2. **配置AI客户端**: 在Cursor、Claude Desktop或VS Code中配置MCP连接
+3. **智能对话生成**: 通过自然语言描述项目需求，系统会渐进式理解并生成专业提示词
+4. **项目快速创建**: `vibecli create my-app` 使用生成的提示词快速搭建应用
+5. **智能功能扩展**: `vibecli add auth` 基于上下文智能添加功能模块
 
 完整示例和文档请查看 [examples/](./examples/) 目录，详细架构信息请参考 [ARCHITECTURE.md](ARCHITECTURE.md)。
 
-## 🤖 MCP 协议集成 (AI 智能助手)
+## 🧠 MCP智能提示词生成系统
 
-VibeCLI v1.2.0 新增了对 Model Context Protocol (MCP) 的完整支持，提供AI驱动的智能项目分析和生成能力。通过MCP协议，你可以在支持的AI客户端中直接使用VibeCLI的智能功能。
+VibeCLI v1.3.0 实现了革命性的**MCP智能提示词生成系统**，通过多轮对话上下文进行智能匹配，自动生成专业级开发指导提示词。系统使用MCP协议的原生上下文能力，确保隐私安全和响应速度。
+
+### 🎯 智能提示词生成核心功能
+
+- **📝 多轮对话分析**: 渐进式理解用户项目需求和技术偏好
+- **🎨 上下文感知模板选择**: 自动匹配最适合的VibeCLI提示词模板
+- **📊 智能置信度评估**: 动态评估理解程度，提供精准的澄清问题
+- **💡 项目类型智能识别**: 支持电商、SaaS、博客、作品集、仪表板等项目类型
+- **⚙️ 技术栈自动推荐**: 基于项目复杂度和用户经验智能推荐技术组合
 
 ### 📦 MCP 安装
 
 #### NPM 全局安装
 ```bash
-npm install -g vibe-cli-tool@latest
+npm install -g vibe-cli-tool@1.3.0
 ```
 
-> **当前版本**: v1.2.8  
-> **包地址**: https://www.npmjs.com/package/vibe-cli-tool
+> **当前版本**: v1.3.0 🎉  
+> **包地址**: https://www.npmjs.com/package/vibe-cli-tool  
+> **新特性**: MCP智能提示词生成系统
 
 #### NPX 临时使用
 ```bash
-npx --package=vibe-cli-tool@latest vibecli-mcp-server
+npx --package=vibe-cli-tool@1.3.0 vibecli-mcp-server
 ```
 
 #### 从源码安装
@@ -64,11 +83,11 @@ npm run mcp:dev
 # 全局安装后直接使用
 vibecli-mcp-server
 
-# 或使用 npx 临时运行
-npx --package=vibe-cli-tool@latest vibecli-mcp-server
+# 或使用 npx 临时运行  
+npx --package=vibe-cli-tool@1.3.0 vibecli-mcp-server
 
 # 调试模式
-npx --package=vibe-cli-tool@latest vibecli-mcp-server --debug
+npx --package=vibe-cli-tool@1.3.0 vibecli-mcp-server --debug
 ```
 
 #### 2. 配置 MCP 客户端
@@ -81,7 +100,7 @@ npx --package=vibe-cli-tool@latest vibecli-mcp-server --debug
   "mcpServers": {
     "vibecli": {
       "command": "npx",
-      "args": ["-y", "--package=vibe-cli-tool@latest", "vibecli-mcp-server"],
+      "args": ["-y", "--package=vibe-cli-tool@1.3.0", "vibecli-mcp-server"],
       "env": {
         "NODE_ENV": "production"
       }
@@ -98,7 +117,7 @@ npx --package=vibe-cli-tool@latest vibecli-mcp-server --debug
   "mcpServers": {
     "vibecli": {
       "command": "npx",
-      "args": ["-y", "--package=vibe-cli-tool@latest", "vibecli-mcp-server"],
+      "args": ["-y", "--package=vibe-cli-tool@1.3.0", "vibecli-mcp-server"],
       "env": {
         "NODE_ENV": "production"
       }
@@ -116,7 +135,7 @@ npx --package=vibe-cli-tool@latest vibecli-mcp-server --debug
     {
       "name": "vibecli",
       "command": "npx",
-      "args": ["-y", "--package=vibe-cli-tool@latest", "vibecli-mcp-server"],
+      "args": ["-y", "--package=vibe-cli-tool@1.3.0", "vibecli-mcp-server"],
       "cwd": "${workspaceFolder}",
       "env": {
         "NODE_ENV": "production"
@@ -129,6 +148,12 @@ npx --package=vibe-cli-tool@latest vibecli-mcp-server --debug
 #### 3. MCP 工具使用
 
 一旦配置完成，你就可以在AI客户端中使用以下VibeCLI MCP工具：
+
+**🎨 prompt_generator** - MCP智能提示词生成器 [v1.3.0 NEW]
+```
+我想开发一个电商网站，需要支付功能和用户管理
+```
+系统会通过多轮对话逐步理解您的需求，生成专业的开发指导提示词。
 
 **🎯 project_analyzer** - 智能项目分析
 ```
@@ -183,18 +208,35 @@ VibeCLI MCP 支持智能会话管理：
 
 ```bash
 # 测试 MCP 服务器是否正常启动
-npx --package=vibe-cli-tool@latest vibecli-mcp-server --help
+npx --package=vibe-cli-tool@1.3.0 vibecli-mcp-server --help
 
 # 查看版本信息
-npx --package=vibe-cli-tool@latest vibecli-mcp-server --version
+npx --package=vibe-cli-tool@1.3.0 vibecli-mcp-server --version
 
 # 启用调试模式查看详细日志
-npx --package=vibe-cli-tool@latest vibecli-mcp-server --debug
+npx --package=vibe-cli-tool@1.3.0 vibecli-mcp-server --debug
 ```
 
-### 💡 MCP 使用示例
+### 💡 v1.3.0 智能提示词生成示例
 
-**完整项目生成流程**:
+**MCP智能对话流程** [NEW]:
+```
+1. 用户: "我想做一个电商网站"
+2. VibeCLI: "理解程度:40%，需要更多信息。您希望项目包含哪些主要功能？"
+3. 用户: "需要用户登录、商品管理、购物车、支付"  
+4. VibeCLI: "理解程度:75%，项目类型:电商，功能:认证+支付+管理"
+5. 用户: "生成提示词"
+6. VibeCLI: 自动生成专业的电商开发指导提示词，包含完整技术栈和实现细节
+```
+
+**智能上下文累积**:
+- 📝 **渐进式理解**: 通过多轮对话逐步构建完整的项目画像
+- 🎯 **智能澄清**: 置信度不足时自动提出针对性问题
+- 💾 **会话记忆**: 跨对话轮次保持项目信息和用户偏好
+- 🎨 **模板匹配**: 基于累积上下文选择最适合的提示词模板
+- 📊 **动态评估**: 实时评估理解程度并调整对话策略
+
+**传统项目生成流程**:
 ```
 1. AI客户端: "我想创建一个SaaS项目，包含用户订阅、支付和数据分析功能"
 2. VibeCLI分析: 智能识别为SaaS类型，推荐Next.js + PostgreSQL + Stripe技术栈
@@ -203,18 +245,28 @@ npx --package=vibe-cli-tool@latest vibecli-mcp-server --debug
 5. 部署上线: 自动配置部署到Vercel或其他平台
 ```
 
-**AI智能决策展示**:
-- 🧠 **项目类型识别**: 基于自然语言描述自动识别项目类型
-- 📊 **复杂度评估**: 智能评估项目复杂度和开发时间
-- 🏗️ **架构推荐**: 根据约束条件推荐最适合的技术架构
-- ⚠️ **风险评估**: 识别潜在风险并提供缓解方案
-- 🔄 **替代方案**: 提供多个可选的技术栈组合
+### 🎯 v1.3.0 MCP智能提示词使用指南
 
-### 🎯 MCP 提示词使用指南
+一旦配置完成 MCP 客户端，你可以使用 `@vibecli` 前缀来唤醒 VibeCLI MCP 服务器。v1.3.0新增的智能提示词生成系统会通过多轮对话理解您的需求：
 
-一旦配置完成 MCP 客户端，你可以使用 `@vibecli` 前缀来唤醒 VibeCLI MCP 服务器。以下是一些实用的提示词示例：
+#### 🎨 智能提示词生成 [v1.3.0 NEW]
 
-#### 🏗️ 项目创建提示词
+**简单描述开始**:
+```
+@vibecli 我想开发一个在线商城
+```
+
+**渐进式对话示例**:
+```
+用户: "我想做一个博客网站"
+VibeCLI: "理解度:50%，请问您希望博客支持多用户发布还是个人博客？需要评论功能吗？"
+用户: "个人博客，需要评论和分类功能"  
+VibeCLI: "理解度:80%，项目类型:个人博客，功能:评论+分类。请问您的技术水平如何？"
+用户: "中级开发者，生成提示词"
+VibeCLI: [自动生成针对中级开发者的个人博客开发指导提示词]
+```
+
+#### 🏗️ 传统项目创建提示词
 
 ```
 @vibecli 帮我创建一个电商网站，需要包含：
@@ -361,13 +413,19 @@ in a Next.js application?
 - 离线功能
 ```
 
-### 🎪 MCP 互动技巧
+### 🎪 v1.3.0 MCP智能对话技巧
 
-1. **具体描述需求**：提供详细的功能需求和技术要求
-2. **指定路径**：明确项目路径和文件位置
-3. **分步骤操作**：复杂功能可以分步骤实现
-4. **利用上下文**：VibeCLI 会记住对话上下文，可以进行连续操作
-5. **验证结果**：生成代码后可以要求解释和验证
+1. **从简单描述开始**：无需提供完整需求，系统会通过对话逐步理解
+2. **相信渐进式过程**：让VibeCLI通过多轮问答构建完整项目画像
+3. **及时回应澄清问题**：系统的问题都是为了更好地理解您的需求
+4. **说明技术水平**：告知您的开发经验，获得更合适的指导内容
+5. **充分利用会话记忆**：在同一会话中可以持续优化和调整需求
+
+**v1.3.0 特有优势**:
+- 🔒 **隐私安全**: 不依赖外部AI服务，使用MCP原生上下文
+- ⚡ **响应快速**: 本地化处理，无网络延迟
+- 🧠 **智能学习**: 会话内记忆用户偏好和项目信息
+- 🎯 **精准匹配**: 基于累积上下文选择最佳模板
 
 ## AI 工具提示词模板
 
