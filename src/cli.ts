@@ -10,9 +10,9 @@ import { generateApi } from './commands/generate.js'
 const program = new Command()
 
 program
-  .name('web-cli')
-  .description('快速创建现代化Web全栈应用的CLI工具')
-  .version('1.0.0')
+  .name('vibecli')
+  .description('VibeCLI - AI驱动的Web全栈应用CLI工具')
+  .version('1.6.0')
 
 // 创建新应用
 program
@@ -53,15 +53,15 @@ program
 program.on('--help', () => {
   console.log('')
   console.log(chalk.blue('示例用法:'))
-  console.log('  $ web-cli create my-app')
-  console.log('  $ web-cli create my-app --template ecommerce --database mysql')
-  console.log('  $ web-cli add auth')
-  console.log('  $ web-cli generate api users')
-  console.log('  $ web-cli deploy --platform vercel')
+  console.log('  $ vibecli create my-app')
+  console.log('  $ vibecli create my-app --template ecommerce --database mysql')
+  console.log('  $ vibecli add auth')
+  console.log('  $ vibecli generate api users')
+  console.log('  $ vibecli deploy --platform vercel')
   console.log('')
   console.log(chalk.blue('更多信息:'))
-  console.log('  文档: https://github.com/codeauto/web-cli#readme')
-  console.log('  问题: https://github.com/codeauto/web-cli/issues')
+  console.log('  文档: https://github.com/vibetemplate/vibecli#readme')
+  console.log('  问题: https://github.com/vibetemplate/vibecli/issues')
 })
 
 program.parse()

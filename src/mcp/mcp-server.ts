@@ -23,7 +23,7 @@ import type { ProjectConfig, PromptGenerationConfig, PromptContext } from '../co
 // 获取包版本 - 简化版本，避免动态文件读取问题
 function getPackageVersion(): string {
   // 使用固定版本，避免在NPX环境中动态读取文件的问题
-  return '1.5.7';
+  return '1.6.0';
 }
 
 // 解析命令行参数

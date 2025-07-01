@@ -1,11 +1,12 @@
 {
   "name": "vibe-cli-tool",
-  "version": "1.5.7",
-  "description": "VibeCLI v1.5.7 - 修复MCP服务器稳定性问题，完全支持ES模块，Web全栈应用CLI工具",
+  "version": "1.6.0",
+  "description": "VibeCLI v1.6.0 - 稳定版本，完整修复CLI和MCP服务器，Web全栈应用CLI工具",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
+    "vibecli": "dist/cli.js",
     "vibecli-mcp-server": "dist/mcp/mcp-server.js"
   },
   "scripts": {
