@@ -1,7 +1,7 @@
 {
   "name": "vibe-cli-tool",
-  "version": "1.5.3",
-  "description": "VibeCLI v1.5.3 - 添加专用电商模板，修复模板生成系统，Web全栈应用CLI工具",
+  "version": "1.5.4",
+  "description": "VibeCLI v1.5.4 - 修复模板路径解析问题，支持NPX运行，Web全栈应用CLI工具",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

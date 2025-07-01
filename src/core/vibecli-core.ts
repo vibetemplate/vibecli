@@ -10,6 +10,29 @@ import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+
+// 获取模板目录的绝对路径
+function getTemplatesDirectory(): string {
+  // 从当前文件路径向上查找，直到找到templates目录
+  let currentDir = __dirname
+  
+  while (currentDir !== path.dirname(currentDir)) {
+    const templatesPath = path.join(currentDir, 'templates')
+    if (fs.existsSync(templatesPath)) {
+      return templatesPath
+    }
+    // 向上一级目录查找
+    currentDir = path.dirname(currentDir)
+  }
+  
+  // 如果找不到，尝试使用相对路径（开发环境）
+  const fallbackPath = path.join(__dirname, '../../templates')
+  if (fs.existsSync(fallbackPath)) {
+    return fallbackPath
+  }
+  
+  throw new Error('无法找到templates目录。请确保VibeCLI正确安装。')
+}
 import {
   ProjectConfig,
   ProjectResult,
@@ -422,11 +445,12 @@ export class VibeCLICore {
 
     // 根据模板生成项目
     const templateName = this.getTemplateName(config)
-    const templatePath = path.join(__dirname, '../../templates', templateName)
+    const templatesDir = getTemplatesDirectory()
+    const templatePath = path.join(templatesDir, templateName)
     
     // 检查模板是否存在
     if (!fs.existsSync(templatePath)) {
-      throw new Error(`模板 ${templateName} 不存在。可用模板: default, auth-system, ecommerce`)
+      throw new Error(`模板 ${templateName} 不存在。模板目录: ${templatesDir}，可用模板: default, auth-system, ecommerce`)
     }
 
     // 准备模板变量
@@ -578,7 +602,8 @@ export class VibeCLICore {
     
     // 简化逻辑：只实现auth功能，从auth-system模板提取
     if (feature.name === 'auth') {
-      const authTemplatePath = path.join(__dirname, '../../templates/auth-system')
+      const templatesDir = getTemplatesDirectory()
+      const authTemplatePath = path.join(templatesDir, 'auth-system')
       
       if (!fs.existsSync(authTemplatePath)) {
         throw new Error('认证模板不存在')

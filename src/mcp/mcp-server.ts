@@ -24,7 +24,7 @@ const program = new Command();
 program
   .name('vibecli-mcp-server')
   .description('VibeCLI MCP服务器 - AI驱动的Web全栈应用CLI工具')
-  .version('1.5.0')
+  .version('1.5.4')
   .option('--debug', '启用调试模式')
   .option('--no-telemetry', '禁用遥测')
   .parse();
@@ -34,7 +34,7 @@ const options = program.opts();
 // 创建MCP服务器
 const server = new McpServer({
   name: 'vibecli-mcp',
-  version: '1.5.0'
+  version: '1.5.4'
 });
 
 // 初始化核心组件
