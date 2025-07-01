@@ -60,10 +60,11 @@ function getProjectTargetPath(projectName: string, targetDirectory?: string): st
 function determineTemplate(projectType: string): string {
   const templateMap: Record<string, string> = {
     'blog': 'default',
-    'ecommerce': 'auth-system',
+    'ecommerce': 'ecommerce',
     'dashboard': 'auth-system',
     'portfolio': 'default',
     'cms': 'auth-system',
+    'saas': 'auth-system',
     'api': 'default',
     'landing': 'default'
   };

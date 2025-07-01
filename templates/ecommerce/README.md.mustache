@@ -1,0 +1,213 @@
+# {{projectName}}
+
+一个功能完整的电商网站，基于 Next.js 14、TypeScript、Prisma 和 Stripe 构建。
+
+## ✨ 功能特性
+
+- 🔐 **用户认证系统** - 注册、登录、密码重置
+- 🛍️ **商品管理** - 商品展示、分类、搜索、筛选
+- 🛒 **购物车系统** - 添加、删除、修改商品数量
+- 💳 **支付集成** - Stripe 安全支付处理
+- 📦 **订单管理** - 订单创建、状态跟踪、历史记录
+- 👤 **用户中心** - 个人信息、地址管理、订单历史
+- ⭐ **商品评价** - 用户评分和评论系统
+- 📱 **响应式设计** - 适配桌面和移动设备
+- 🎨 **现代UI** - 基于 Tailwind CSS 和 Radix UI
+
+## 🛠️ 技术栈
+
+- **前端**: Next.js 14, React 18, TypeScript
+- **样式**: Tailwind CSS, Radix UI
+- **数据库**: {{databaseProvider}} + Prisma ORM
+- **支付**: Stripe
+- **认证**: JWT + bcrypt
+- **状态管理**: Zustand
+- **表单**: React Hook Form + Zod
+- **部署**: Vercel (推荐)
+
+## 🚀 快速开始
+
+### 1. 安装依赖
+
+```bash
+npm install
+```
+
+### 2. 环境配置
+
+复制 `.env.example` 到 `.env.local` 并配置以下变量：
+
+```bash
+cp .env.example .env.local
+```
+
+```env
+# 数据库
+DATABASE_URL="{{databaseUrl}}"
+
+# JWT 密钥
+JWT_SECRET="your-jwt-secret-here"
+JWT_REFRESH_SECRET="your-refresh-secret-here"
+
+# Stripe 配置
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_PUBLISHABLE_KEY="pk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
+```
+
+### 3. 数据库设置
+
+```bash
+# 生成 Prisma 客户端
+npm run db:generate
+
+# 推送数据库架构
+npm run db:push
+
+# (可选) 查看数据库
+npm run db:studio
+```
+
+### 4. 启动开发服务器
+
+```bash
+npm run dev
+```
+
+访问 [http://localhost:3000](http://localhost:3000) 查看你的电商网站！
+
+## 📁 项目结构
+
+```
+{{projectName}}/
+├── src/
+│   ├── app/                 # Next.js 13+ App Router
+│   │   ├── api/            # API 路由
+│   │   ├── auth/           # 认证页面
+│   │   ├── products/       # 商品页面
+│   │   ├── cart/           # 购物车页面
+│   │   └── checkout/       # 结账页面
+│   ├── components/         # React 组件
+│   │   ├── ui/            # 基础 UI 组件
+│   │   ├── auth/          # 认证组件
+│   │   ├── product/       # 商品组件
+│   │   └── cart/          # 购物车组件
+│   ├── lib/               # 工具函数和配置
+│   │   ├── db.ts          # 数据库连接
+│   │   ├── auth.ts        # 认证工具
+│   │   ├── stripe.ts      # Stripe 配置
+│   │   └── utils.ts       # 通用工具
+│   ├── hooks/             # 自定义 React Hooks
+│   ├── stores/            # Zustand 状态管理
+│   └── types/             # TypeScript 类型定义
+├── prisma/
+│   └── schema.prisma      # 数据库模型
+├── public/                # 静态资源
+└── docs/                  # 项目文档
+```
+
+## 🔧 开发指南
+
+### 添加新商品
+
+1. 登录管理后台 `/admin`
+2. 进入商品管理
+3. 点击"添加商品"
+4. 填写商品信息并上传图片
+
+### 配置支付
+
+1. 在 [Stripe Dashboard](https://dashboard.stripe.com) 创建账户
+2. 获取 API 密钥并添加到环境变量
+3. 配置 Webhook 端点: `your-domain.com/api/webhooks/stripe`
+4. 测试支付流程
+
+### 自定义主题
+
+编辑 `tailwind.config.js` 文件来自定义颜色、字体等样式：
+
+```js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50: '#eff6ff',
+          500: '#3b82f6',
+          600: '#2563eb',
+        }
+      },
+    },
+  },
+}
+```
+
+## 📚 API 文档
+
+### 认证 API
+
+- `POST /api/auth/register` - 用户注册
+- `POST /api/auth/login` - 用户登录
+- `POST /api/auth/logout` - 用户登出
+- `GET /api/auth/me` - 获取当前用户信息
+
+### 商品 API
+
+- `GET /api/products` - 获取商品列表
+- `GET /api/products/[id]` - 获取单个商品
+- `POST /api/products` - 创建商品 (管理员)
+- `PUT /api/products/[id]` - 更新商品 (管理员)
+- `DELETE /api/products/[id]` - 删除商品 (管理员)
+
+### 购物车 API
+
+- `GET /api/cart` - 获取购物车
+- `POST /api/cart` - 添加商品到购物车
+- `PUT /api/cart/[id]` - 更新购物车项目
+- `DELETE /api/cart/[id]` - 从购物车删除商品
+
+### 订单 API
+
+- `GET /api/orders` - 获取订单列表
+- `GET /api/orders/[id]` - 获取单个订单
+- `POST /api/orders` - 创建订单
+- `PUT /api/orders/[id]` - 更新订单状态
+
+## 🚀 部署
+
+### Vercel 部署 (推荐)
+
+1. 将代码推送到 GitHub
+2. 在 [Vercel](https://vercel.com) 导入项目
+3. 配置环境变量
+4. 部署完成
+
+### Docker 部署
+
+```bash
+# 构建镜像
+docker build -t {{projectName}} .
+
+# 运行容器
+docker run -p 3000:3000 {{projectName}}
+```
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+## 📄 许可证
+
+MIT License
+
+## 🆘 获取帮助
+
+- 📖 [Next.js 文档](https://nextjs.org/docs)
+- 🎨 [Tailwind CSS 文档](https://tailwindcss.com/docs)
+- 💳 [Stripe 文档](https://stripe.com/docs)
+- 🗄️ [Prisma 文档](https://www.prisma.io/docs)
+
+---
+
+基于 VibeCLI v{{vibecliVersion}} 生成

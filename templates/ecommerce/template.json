@@ -1,0 +1,53 @@
+{
+  "name": "ecommerce",
+  "displayName": "电商网站模板",
+  "description": "功能完整的电商网站模板，包含用户认证、商品管理、购物车、支付等核心功能",
+  "version": "1.0.0",
+  "features": {
+    "auth": true,
+    "admin": true,
+    "upload": true,
+    "email": true,
+    "payment": true,
+    "realtime": false
+  },
+  "requiredDependencies": [
+    "@prisma/client",
+    "prisma",
+    "bcryptjs",
+    "jsonwebtoken",
+    "zod",
+    "react-hook-form",
+    "@hookform/resolvers",
+    "zustand",
+    "stripe",
+    "@stripe/stripe-js",
+    "react-hot-toast",
+    "lucide-react"
+  ],
+  "devDependencies": [
+    "@types/bcryptjs",
+    "@types/jsonwebtoken"
+  ],
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "stripe:listen": "stripe listen --forward-to localhost:3000/api/webhooks/stripe"
+  },
+  "envVariables": [
+    "DATABASE_URL",
+    "JWT_SECRET",
+    "JWT_REFRESH_SECRET",
+    "NEXTAUTH_SECRET",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_PUBLISHABLE_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"
+  ]
+}

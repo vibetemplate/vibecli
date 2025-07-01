@@ -1,0 +1,73 @@
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+
+export default function HomePage() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <div className="container mx-auto px-4 py-16">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-8">
+            欢迎来到 {{projectName}}
+          </h1>
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            一个功能完整的电商平台，包含用户认证、商品管理、购物车、支付等核心功能
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-8 mt-16">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-4">🛍️ 商品管理</h3>
+              <p className="text-gray-600 mb-4">
+                完整的商品分类、库存管理、价格设置等功能
+              </p>
+              <Link href="/admin/products">
+                <Button variant="outline">查看商品</Button>
+              </Link>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-4">🔐 用户系统</h3>
+              <p className="text-gray-600 mb-4">
+                安全的用户注册、登录、个人中心等功能
+              </p>
+              <Link href="/auth/login">
+                <Button variant="outline">用户登录</Button>
+              </Link>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-4">💳 支付系统</h3>
+              <p className="text-gray-600 mb-4">
+                集成 Stripe 安全支付，支持多种支付方式
+              </p>
+              <Link href="/checkout">
+                <Button variant="outline">购物车</Button>
+              </Link>
+            </div>
+          </div>
+          
+          <div className="mt-16 p-8 bg-blue-50 rounded-lg">
+            <h2 className="text-2xl font-bold mb-4">🚀 快速开始</h2>
+            <div className="text-left max-w-2xl mx-auto space-y-4">
+              <div className="flex items-start space-x-3">
+                <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">1</span>
+                <p>配置数据库连接：编辑 <code className="bg-gray-200 px-2 py-1 rounded">.env.local</code> 文件</p>
+              </div>
+              <div className="flex items-start space-x-3">
+                <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</span>
+                <p>初始化数据库：运行 <code className="bg-gray-200 px-2 py-1 rounded">npm run db:push</code></p>
+              </div>
+              <div className="flex items-start space-x-3">
+                <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">3</span>
+                <p>配置 Stripe：在 Stripe Dashboard 获取 API 密钥</p>
+              </div>
+              <div className="flex items-start space-x-3">
+                <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">4</span>
+                <p>开始开发：查看 <code className="bg-gray-200 px-2 py-1 rounded">README.md</code> 了解更多</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

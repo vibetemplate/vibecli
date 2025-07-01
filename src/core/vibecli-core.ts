@@ -426,7 +426,7 @@ export class VibeCLICore {
     
     // 检查模板是否存在
     if (!fs.existsSync(templatePath)) {
-      throw new Error(`模板 ${templateName} 不存在。可用模板: default, auth-system`)
+      throw new Error(`模板 ${templateName} 不存在。可用模板: default, auth-system, ecommerce`)
     }
 
     // 准备模板变量
@@ -838,10 +838,15 @@ module.exports = {
   // 新的模板系统辅助方法
 
   private getTemplateName(config: ProjectConfig): string {
-    // 如果指定了模板，使用指定的模板
+    // 如果指定了模板，直接使用指定的模板
     if (config.template && config.template !== 'default') {
-      // 将ecommerce映射到auth-system，因为auth-system包含电商所需的认证功能
-      return config.template === 'ecommerce' ? 'auth-system' : config.template
+      return config.template
+    }
+
+    // 根据项目特征自动选择模板
+    // 如果有支付功能，使用电商模板
+    if (config.features.payment) {
+      return 'ecommerce'
     }
 
     // 如果启用了认证功能，使用auth-system模板
