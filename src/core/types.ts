@@ -108,6 +108,7 @@ export interface ProjectStatus {
 // 提示词相关类型定义
 export interface PromptGenerationConfig {
   userDescription: string
+  requirements?: string[]
   projectType?: string
   detectedFeatures?: string[]
   complexityLevel?: 'simple' | 'medium' | 'complex'

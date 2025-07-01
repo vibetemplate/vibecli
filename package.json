@@ -1,7 +1,7 @@
 {
   "name": "vibe-cli-tool",
-  "version": "1.5.1",
-  "description": "VibeCLI v1.5.0 - 智能模板匹配与降级处理系统，Web全栈应用CLI工具",
+  "version": "1.5.2",
+  "description": "VibeCLI v1.5.2 - 增强项目分析器与目录生成修复，Web全栈应用CLI工具",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

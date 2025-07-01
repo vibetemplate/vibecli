@@ -17,11 +17,11 @@ export interface KeywordMapping {
 export class IntentAnalyzer {
   private projectTypeKeywords: Record<string, KeywordMapping[]> = {
     ecommerce: [
-      { keywords: ['电商', '商城', '购物', '支付', '订单', '商品', 'shop', 'cart', 'payment', 'store', '网店', 'ecommerce', 'e-commerce', '在线商店', '零售', 'marketplace'], weight: 10, category: 'type' },
+      { keywords: ['电商', '商城', '购物', '支付', '订单', '商品', 'shop', 'cart', 'payment', 'store', '网店', 'ecommerce', 'e-commerce', '在线商店', '零售', 'marketplace', '电商平台', 'platform', '平台', '购买', '销售', '交易'], weight: 10, category: 'type' },
       { keywords: ['库存', '商品管理', 'inventory', '商户', '多商户', '供应商', '分销', '仓储', '物流', 'logistics'], weight: 8, category: 'feature' },
       { keywords: ['stripe', 'paypal', '支付宝', '微信支付', 'alipay', 'wechat pay', '收银台', '结算'], weight: 6, category: 'tech' },
       { keywords: ['优惠券', '促销', '折扣', 'coupon', 'discount', '营销', 'marketing'], weight: 7, category: 'feature' },
-      { keywords: ['购物车', '结账', '下单', 'checkout', 'order', '配送', 'shipping'], weight: 9, category: 'type' }
+      { keywords: ['购物车', '结账', '下单', 'checkout', 'order', '配送', 'shipping', '结算', '购买流程', '支付处理', '支付集成'], weight: 9, category: 'type' }
     ],
     saas: [
       { keywords: ['saas', '订阅', '多租户', '仪表板', 'dashboard', 'subscription', 'tenant', '企业级', 'software as a service', '软件服务'], weight: 10, category: 'type' },
@@ -54,7 +54,7 @@ export class IntentAnalyzer {
   }
 
   private featureKeywords: Record<string, string[]> = {
-    auth: ['登录', '注册', '认证', '用户', 'login', 'register', 'auth', 'user'],
+    auth: ['登录', '注册', '认证', '用户', 'login', 'register', 'auth', 'user', '用户系统', '认证系统'],
     payment: ['支付', '付款', '交易', 'payment', 'pay', 'transaction', 'stripe'],
     admin: ['管理', '后台', '管理员', 'admin', 'management'],
     upload: ['上传', '文件', '图片', 'upload', 'file', 'image'],
@@ -101,31 +101,49 @@ export class IntentAnalyzer {
   }
 
   /**
-   * 识别项目类型
+   * 识别项目类型 - 增强版算法
    */
   private identifyProjectType(description: string): string {
     const scores: Record<string, number> = {}
+    const lowerDescription = description.toLowerCase()
 
     // 遍历所有项目类型的关键词
     Object.entries(this.projectTypeKeywords).forEach(([type, mappings]) => {
       scores[type] = 0
       
       mappings.forEach(mapping => {
-        if (mapping.category === 'type') {
-          mapping.keywords.forEach(keyword => {
-            if (description.includes(keyword)) {
-              scores[type] += mapping.weight
-            }
-          })
-        }
+        mapping.keywords.forEach(keyword => {
+          if (lowerDescription.includes(keyword.toLowerCase())) {
+            // 根据类别给予不同权重加成
+            let weightMultiplier = 1
+            if (mapping.category === 'type') weightMultiplier = 1.5  // 类型关键词最重要
+            else if (mapping.category === 'feature') weightMultiplier = 1.2  // 功能关键词次重要
+            else if (mapping.category === 'tech') weightMultiplier = 0.8     // 技术关键词权重较低
+            
+            scores[type] += mapping.weight * weightMultiplier
+            
+            // 调试输出
+            console.error(`🔍 匹配到关键词: "${keyword}" -> ${type} (+${mapping.weight * weightMultiplier}分)`);
+          }
+        })
       })
     })
+
+    // 输出所有得分
+    console.error('📊 项目类型得分:', scores);
 
     // 找到得分最高的项目类型
     const bestMatch = Object.entries(scores).reduce((best, [type, score]) => {
       return score > best.score ? { type, score } : best
-    }, { type: 'blog', score: 0 }) // 默认为 blog
+    }, { type: 'portfolio', score: 0 }) // 改为默认 portfolio，避免博客偏向
 
+    // 如果最高分太低，说明识别不够准确
+    if (bestMatch.score < 10) {
+      console.error('⚠️ 项目类型识别置信度过低，使用基于关键词数量的备选算法');
+      return this.fallbackProjectTypeIdentification(lowerDescription);
+    }
+
+    console.error(`✅ 识别为项目类型: ${bestMatch.type} (得分: ${bestMatch.score})`);
     return bestMatch.type
   }
 
@@ -197,6 +215,60 @@ export class IntentAnalyzer {
   }
 
   /**
+   * 备选项目类型识别算法（基于关键词频次）
+   */
+  private fallbackProjectTypeIdentification(description: string): string {
+    // 简单的关键词计数方法
+    const typeKeywordCounts: Record<string, number> = {
+      ecommerce: 0,
+      saas: 0,
+      blog: 0,
+      portfolio: 0,
+      dashboard: 0
+    }
+
+    // 电商强特征词
+    const ecommerceWords = ['电商', 'ecommerce', '购物', '商城', '支付', '订单', '商品', '购买', '结算', '购物车']
+    ecommerceWords.forEach(word => {
+      if (description.includes(word)) typeKeywordCounts.ecommerce += 1
+    })
+
+    // SaaS强特征词
+    const saasWords = ['saas', '订阅', '企业级', '多租户', '仪表板', 'dashboard', '计费']
+    saasWords.forEach(word => {
+      if (description.includes(word)) typeKeywordCounts.saas += 1
+    })
+
+    // 博客强特征词
+    const blogWords = ['博客', 'blog', '文章', '内容管理', 'cms', '发布']
+    blogWords.forEach(word => {
+      if (description.includes(word)) typeKeywordCounts.blog += 1
+    })
+
+    // 作品集强特征词
+    const portfolioWords = ['作品集', 'portfolio', '个人网站', '展示', '简历']
+    portfolioWords.forEach(word => {
+      if (description.includes(word)) typeKeywordCounts.portfolio += 1
+    })
+
+    // 后台管理强特征词
+    const dashboardWords = ['管理后台', '数据可视化', '图表', '分析', 'admin', '控制台']
+    dashboardWords.forEach(word => {
+      if (description.includes(word)) typeKeywordCounts.dashboard += 1
+    })
+
+    // 找到最高频次的类型
+    const maxType = Object.entries(typeKeywordCounts).reduce((max, [type, count]) => {
+      return count > max.count ? { type, count } : max
+    }, { type: 'portfolio', count: 0 })
+
+    console.error('🔄 备选算法得分:', typeKeywordCounts);
+    console.error(`🎯 备选算法结果: ${maxType.type} (匹配${maxType.count}个关键词)`);
+
+    return maxType.type
+  }
+
+  /**
    * 计算置信度 - 增强版算法
    */
   private calculateConfidence(description: string, projectType: string, features: string[]): number {
@@ -205,10 +277,12 @@ export class IntentAnalyzer {
     // 1. 项目类型关键词匹配度（权重最高）
     const typeScore = this.calculateTypeMatchScore(description, projectType)
     confidence += typeScore
+    console.error(`🎯 类型匹配得分: ${typeScore}`);
 
     // 2. 功能特征一致性评分
     const featureScore = this.calculateFeatureConsistencyScore(description, projectType, features)
     confidence += featureScore
+    console.error(`🔧 功能一致性得分: ${featureScore}`);
 
     // 3. 描述质量评分
     const qualityScore = this.calculateDescriptionQualityScore(description)
@@ -222,7 +296,9 @@ export class IntentAnalyzer {
     const semanticScore = this.calculateSemanticCompletenessScore(description, projectType)
     confidence += semanticScore
 
-    return Math.min(100, confidence)
+    const finalConfidence = Math.min(100, confidence)
+    console.error(`🎊 最终置信度: ${finalConfidence}%`);
+    return finalConfidence
   }
 
   /**

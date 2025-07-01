@@ -16,6 +16,7 @@ import path from 'path';
 import { VibeCLICore } from '../core/vibecli-core.js';
 import { promptTemplateEngine } from '../prompts/dynamic/template-engine.js';
 import { mcpContextManager } from './mcp-context-manager.js';
+import { intentAnalyzer } from '../prompts/dynamic/intent-analyzer.js';
 import type { ProjectConfig, PromptGenerationConfig, PromptContext } from '../core/types.js';
 
 // 解析命令行参数
@@ -39,19 +40,10 @@ const server = new McpServer({
 // 初始化核心组件
 const vibecliCore = new VibeCLICore();
 
-// 辅助函数：获取默认项目目录（与core中保持一致）
+// 辅助函数：获取默认项目目录（生成到当前工作目录）
 function getDefaultProjectDirectory(): string {
-  const homeDir = os.homedir()
-  const platform = os.platform()
-  
-  switch (platform) {
-    case 'darwin': // Mac
-      return path.join(homeDir, 'Development', 'VibeCLI')
-    case 'win32': // Windows  
-      return path.join(homeDir, 'Documents', 'VibeCLI')
-    default: // Linux等
-      return path.join(homeDir, 'Projects', 'VibeCLI')
-  }
+  // 直接使用当前工作目录，而不是创建特定的VibeCLI目录
+  return process.cwd()
 }
 
 // 辅助函数：获取项目预计生成位置
@@ -59,8 +51,8 @@ function getProjectTargetPath(projectName: string, targetDirectory?: string): st
   if (targetDirectory) {
     return path.resolve(targetDirectory, projectName)
   } else {
-    const defaultBaseDir = getDefaultProjectDirectory()
-    return path.join(defaultBaseDir, projectName)
+    // 生成到当前工作目录下
+    return path.join(process.cwd(), projectName)
   }
 }
 
@@ -158,29 +150,38 @@ server.registerTool(
     try {
       console.error('🔍 正在分析项目需求...');
       
-      // 使用MCP原生分析能力
-      const analysis = {
-        projectType: 'blog', // 默认值，实际会通过MCP上下文推断
-        complexity: 5,
-        estimatedTime: '2-3周',
-        recommendedStack: {
-          database: 'postgresql',
-          uiFramework: 'tailwind-radix',
-          features: ['auth'],
-          reasoning: '基于MCP对话上下文的智能推荐'
-        }
+      // 使用真正的智能分析器
+      const config: PromptGenerationConfig = {
+        userDescription: description,
+        requirements: requirements,
+        techStack: [],
+        projectType: undefined,
+        complexityLevel: undefined,
+        detectedFeatures: undefined
+      };
+      
+      const intent = await intentAnalyzer.analyzeUserIntent(config);
+      const validation = intentAnalyzer.validateIntent(intent);
+      
+      // 根据复杂度估算开发时间
+      const timeEstimates = {
+        simple: '1-2周',
+        medium: '2-4周', 
+        complex: '4-8周'
       };
       
       const result = {
-        projectType: analysis.projectType,
+        projectType: intent.projectType,
         recommendedStack: {
-          database: analysis.recommendedStack.database,
-          uiFramework: analysis.recommendedStack.uiFramework,
-          features: analysis.recommendedStack.features
+          database: intent.projectType === 'ecommerce' || intent.projectType === 'saas' ? 'postgresql' : 'sqlite',
+          uiFramework: 'tailwind-radix',
+          features: intent.coreFeatures
         },
-        reasoning: analysis.recommendedStack.reasoning,
-        complexityScore: analysis.complexity,
-        estimatedDevelopmentTime: analysis.estimatedTime
+        reasoning: `基于智能分析，置信度${intent.confidence}%。${validation.warnings.join(' ')}`,
+        complexityScore: intent.complexityLevel === 'simple' ? 3 : intent.complexityLevel === 'medium' ? 6 : 9,
+        estimatedDevelopmentTime: timeEstimates[intent.complexityLevel],
+        confidence: intent.confidence,
+        warnings: validation.warnings
       };
 
       return {
@@ -252,7 +253,8 @@ server.registerTool(
           payment: analysis_result.recommendedStack?.features?.includes('payment') || false,
           realtime: analysis_result.recommendedStack?.features?.includes('realtime') || false
         },
-        targetDirectory: target_directory
+        // 传递当前工作目录作为目标目录，这样项目会在当前目录下创建
+        targetDirectory: target_directory || process.cwd()
       };
 
       const result = await vibecliCore.createProject(projectConfig);
