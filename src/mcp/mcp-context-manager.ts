@@ -1,4 +1,6 @@
 import type { PromptGenerationConfig, PromptContext } from '../core/types.js'
+import { intelligentTemplateMatcher, type TemplateMatchResult, type RequirementFeature } from '../prompts/dynamic/intelligent-template-matcher.js'
+import { intelligentFallbackHandler, type FallbackResult } from '../prompts/dynamic/intelligent-fallback-handler.js'
 
 /**
  * MCP上下文对话历史
@@ -17,6 +19,9 @@ export interface MCPConversationTurn {
     userExperience?: 'beginner' | 'intermediate' | 'expert'
     developmentPhase?: 'planning' | 'development' | 'optimization'
   }
+  templateMatchResult?: TemplateMatchResult
+  fallbackResult?: FallbackResult
+  clarificationQuestions?: ClarificationQuestion[]
 }
 
 /**
@@ -82,9 +87,9 @@ export class MCPContextManager {
   }
 
   /**
-   * 记录用户输入并分析上下文
+   * 记录用户输入并分析上下文 - 增强版，支持智能模板匹配
    */
-  recordUserInput(sessionId: string, userMessage: string): MCPContextAnalysis {
+  async recordUserInput(sessionId: string, userMessage: string): Promise<MCPContextAnalysis> {
     const session = this.getSession(sessionId)
     if (!session) {
       throw new Error(`会话 ${sessionId} 不存在`)
@@ -96,7 +101,10 @@ export class MCPContextManager {
     // 更新累积上下文
     this.updateAccumulatedContext(session, contextClues)
     
-    // 记录对话轮次
+    // 使用智能模板匹配器分析需求
+    const templateMatch = await this.performIntelligentTemplateMatching(session, userMessage, contextClues)
+    
+    // 记录对话轮次，包含模板匹配结果
     const turn: MCPConversationTurn = {
       timestamp: new Date(),
       userMessage,
@@ -105,13 +113,14 @@ export class MCPContextManager {
         features: contextClues.features,
         userExperience: contextClues.userExperience,
         developmentPhase: contextClues.developmentPhase
-      }
+      },
+      templateMatchResult: templateMatch
     }
     
     session.conversationHistory.push(turn)
 
-    // 生成智能响应建议
-    return this.generateIntelligentResponse(session, contextClues)
+    // 基于模板匹配结果生成增强的智能响应
+    return await this.generateEnhancedIntelligentResponse(session, contextClues, templateMatch)
   }
 
   /**
@@ -497,6 +506,315 @@ export class MCPContextManager {
     if (features.length >= 3 || experience === 'intermediate') return 'medium'
     return 'simple'
   }
+
+  /**
+   * 执行智能模板匹配
+   */
+  private async performIntelligentTemplateMatching(
+    session: MCPSessionState,
+    userMessage: string,
+    contextClues: ContextClues
+  ): Promise<TemplateMatchResult> {
+    const context = session.accumulatedContext
+    
+    // 收集所有对话中的信息作为用户描述
+    const allMessages = session.conversationHistory
+      .map(turn => turn.userMessage)
+      .concat([userMessage])
+      .join(' ')
+
+    // 准备约束条件
+    const constraints = {
+      complexity: context.userProfile.experienceLevel,
+      timeline: this.inferTimelineFromContext(session)
+    }
+
+    // 使用智能模板匹配器
+    return await intelligentTemplateMatcher.findBestMatch(
+      allMessages,
+      contextClues.features,
+      context.projectInsights.techPreferences,
+      constraints
+    )
+  }
+
+  /**
+   * 生成增强的智能响应
+   */
+  private async generateEnhancedIntelligentResponse(
+    session: MCPSessionState,
+    contextClues: ContextClues,
+    templateMatch: TemplateMatchResult
+  ): Promise<MCPContextAnalysis> {
+    const context = session.accumulatedContext
+    
+    // 基础置信度计算
+    let confidence = Math.min(contextClues.confidence, templateMatch.matchScore)
+    
+    // 根据模板匹配结果调整响应策略
+    const suggestions: string[] = []
+    const clarifications: string[] = []
+    let fallbackGuidance: FallbackResult | undefined
+    let smartQuestions: ClarificationQuestion[] = []
+
+    if (templateMatch.confidence === 'high') {
+      suggestions.push(`推荐使用 ${templateMatch.template?.name || '默认模板'} 模板`)
+      if (templateMatch.missingFeatures.length > 0) {
+        suggestions.push('需要额外添加以下功能：' + templateMatch.missingFeatures.map(f => f.name).join('、'))
+        
+        // 为缺失功能生成智能问题
+        smartQuestions = this.generateSmartQuestions(templateMatch.missingFeatures, 'enhancement')
+      }
+    } else if (templateMatch.confidence === 'medium') {
+      suggestions.push(`建议基于 ${templateMatch.template?.name || '默认模板'} 模板进行定制`)
+      clarifications.push('请详细描述以下需求以获得更精确的匹配')
+      
+      // 生成具体的澄清问题
+      smartQuestions = this.generateSmartQuestions(templateMatch.missingFeatures, 'clarification')
+    } else {
+      // 低置信度时启用智能降级处理
+      try {
+        fallbackGuidance = await intelligentFallbackHandler.handleFallback(
+          templateMatch,
+          [...templateMatch.matchedFeatures, ...templateMatch.missingFeatures],
+          {
+            experience: contextClues.userExperience || 'intermediate',
+            timeline: this.inferTimelineFromContext(session),
+            preferences: context.projectInsights.techPreferences
+          }
+        )
+
+        suggestions.push('为您提供智能的实现方案：')
+        suggestions.push(`• 推荐策略: ${fallbackGuidance.strategy.reasoning}`)
+        fallbackGuidance.alternatives.forEach(alt => {
+          suggestions.push(`• ${alt.title} (匹配度: ${alt.matchScore}%)`)
+        })
+        
+        // 生成基于降级方案的问题
+        smartQuestions = this.generateFallbackQuestions(fallbackGuidance)
+      } catch (error) {
+        // 降级处理失败时的备用方案
+        suggestions.push('为您提供以下基础实现方案：')
+        templateMatch.suggestedApproach.alternatives.forEach(alt => {
+          suggestions.push(`• ${alt.description} (匹配度: ${alt.matchScore}%)`)
+        })
+        clarifications.push('请选择一个最符合您需求的方案，或提供更多项目细节')
+      }
+    }
+
+    // 添加实施计划建议
+    if (templateMatch.implementation) {
+      suggestions.push(`开发复杂度: ${templateMatch.implementation.complexity}`)
+      suggestions.push(`预估时间: ${templateMatch.implementation.estimatedTime}`)
+    }
+
+    return {
+      confidence,
+      projectType: templateMatch.template?.projectType || contextClues.projectType,
+      features: [
+        ...contextClues.features,
+        ...templateMatch.matchedFeatures.map(f => f.name)
+      ],
+      userExperience: contextClues.userExperience,
+      suggestions,
+      clarifications,
+      readyForGeneration: confidence >= 70 && templateMatch.confidence !== 'low',
+      fallbackGuidance,
+      smartQuestions
+    }
+  }
+
+  /**
+   * 从上下文推断时间线要求
+   */
+  private inferTimelineFromContext(session: MCPSessionState): string {
+    const messages = session.conversationHistory.map(t => t.userMessage).join(' ').toLowerCase()
+    
+    if (messages.includes('紧急') || messages.includes('急') || messages.includes('尽快')) {
+      return 'urgent'
+    }
+    if (messages.includes('灵活') || messages.includes('不急') || messages.includes('慢慢')) {
+      return 'flexible'  
+    }
+    return 'normal'
+  }
+
+  /**
+   * 生成智能澄清问题
+   */
+  private generateSmartQuestions(
+    features: RequirementFeature[],
+    type: 'clarification' | 'enhancement'
+  ): ClarificationQuestion[] {
+    const questions: ClarificationQuestion[] = []
+
+    features.forEach((feature, index) => {
+      if (feature.importance === 'high' || (type === 'enhancement' && feature.complexity > 6)) {
+        const questionId = `q_${Date.now()}_${index}`
+        
+        switch (feature.category) {
+          case 'auth':
+            questions.push({
+              id: questionId,
+              type: 'choice',
+              question: '您希望实现哪种类型的用户认证？',
+              context: '选择适合的认证方式将影响系统的安全性和用户体验',
+              importance: 'high',
+              options: [
+                {
+                  value: 'simple',
+                  label: '简单的邮箱密码认证',
+                  description: '传统的用户名密码登录',
+                  implications: ['开发简单', '安全性一般']
+                },
+                {
+                  value: 'oauth',
+                  label: '社交账号登录 (Google, GitHub等)',
+                  description: '使用第三方OAuth服务',
+                  implications: ['用户体验好', '开发复杂度中等']
+                },
+                {
+                  value: 'advanced',
+                  label: '多因素认证',
+                  description: '包含短信、邮箱验证等',
+                  implications: ['安全性高', '开发复杂度高']
+                }
+              ]
+            })
+            break
+
+          case 'integration':
+            if (feature.name === 'payment') {
+              questions.push({
+                id: questionId,
+                type: 'choice',
+                question: '您需要支持哪些支付方式？',
+                context: '支付方式的选择会影响用户转化率和开发复杂度',
+                importance: 'high',
+                options: [
+                  {
+                    value: 'stripe',
+                    label: 'Stripe (国际标准)',
+                    description: '支持信用卡、数字钱包等',
+                    implications: ['国际化支持好', '手续费较高']
+                  },
+                  {
+                    value: 'local',
+                    label: '本地支付 (支付宝、微信)',
+                    description: '适合中国市场',
+                    implications: ['本地化好', '国际化受限']
+                  },
+                  {
+                    value: 'both',
+                    label: '多种支付方式',
+                    description: '覆盖更多用户群体',
+                    implications: ['覆盖面广', '开发复杂度高']
+                  }
+                ]
+              })
+            }
+            break
+
+          case 'data':
+            questions.push({
+              id: questionId,
+              type: 'choice',
+              question: '您预期的数据规模是多少？',
+              context: '数据规模将影响数据库选择和架构设计',
+              importance: 'medium',
+              options: [
+                {
+                  value: 'small',
+                  label: '小规模 (< 10万条记录)',
+                  description: 'SQLite或简单配置的PostgreSQL',
+                  implications: ['部署简单', '扩展性有限']
+                },
+                {
+                  value: 'medium',
+                  label: '中等规模 (10万-100万条记录)',
+                  description: 'PostgreSQL或MySQL',
+                  implications: ['性能平衡', '维护成本适中']
+                },
+                {
+                  value: 'large',
+                  label: '大规模 (> 100万条记录)',
+                  description: '分布式数据库或云服务',
+                  implications: ['高性能', '复杂度和成本高']
+                }
+              ]
+            })
+            break
+
+          default:
+            // 通用问题
+            questions.push({
+              id: questionId,
+              type: 'text',
+              question: `请详细描述您对 ${feature.name} 功能的具体需求`,
+              context: '具体的需求描述将帮助我们提供更精确的实现方案',
+              importance: feature.importance,
+              expectedAnswer: `${feature.name} 功能的详细说明`
+            })
+        }
+      }
+    })
+
+    return questions
+  }
+
+  /**
+   * 基于降级方案生成问题
+   */
+  private generateFallbackQuestions(fallbackResult: FallbackResult): ClarificationQuestion[] {
+    const questions: ClarificationQuestion[] = []
+
+    // 策略选择问题
+    if (fallbackResult.alternatives.length > 1) {
+      questions.push({
+        id: `fallback_strategy_${Date.now()}`,
+        type: 'choice',
+        question: '请选择您偏好的实现方案',
+        context: '不同方案有不同的优劣势，请根据您的实际情况选择',
+        importance: 'high',
+        options: fallbackResult.alternatives.map(alt => ({
+          value: alt.approach,
+          label: alt.title,
+          description: alt.description,
+          implications: alt.tradeoffs
+        }))
+      })
+    }
+
+    // 重要决策问题
+    fallbackResult.guidance.keyDecisions.forEach((decision, index) => {
+      if (decision.impact === 'high') {
+        questions.push({
+          id: `decision_${Date.now()}_${index}`,
+          type: 'choice',
+          question: decision.decision,
+          context: '这是一个关键决策，将显著影响项目的开发和维护',
+          importance: 'high',
+          options: decision.options.map(opt => ({
+            value: opt.choice,
+            label: opt.choice,
+            description: `优点: ${opt.pros.join(', ')}`,
+            implications: [`缺点: ${opt.cons.join(', ')}`, `复杂度: ${opt.complexity}/10`]
+          }))
+        })
+      }
+    })
+
+    // 时间线确认
+    questions.push({
+      id: `timeline_${Date.now()}`,
+      type: 'confirmation',
+      question: `根据分析，您的项目预计需要 ${fallbackResult.progressive.milestones[0]?.timeEstimate || '2-3周'} 完成第一阶段，这个时间安排是否合适？`,
+      context: '时间安排会影响功能范围和实现策略的选择',
+      importance: 'medium'
+    })
+
+    return questions
+  }
 }
 
 /**
@@ -521,6 +839,29 @@ export interface MCPContextAnalysis {
   suggestions: string[]
   clarifications: string[]
   readyForGeneration: boolean
+  fallbackGuidance?: FallbackResult
+  smartQuestions?: ClarificationQuestion[]
+}
+
+/**
+ * 澄清问题类型
+ */
+export interface ClarificationQuestion {
+  id: string
+  type: 'choice' | 'text' | 'priority' | 'confirmation'
+  question: string
+  context: string
+  importance: 'high' | 'medium' | 'low'
+  options?: QuestionOption[]
+  expectedAnswer?: string
+  followUp?: string[]
+}
+
+export interface QuestionOption {
+  value: string
+  label: string
+  description?: string
+  implications?: string[]
 }
 
 /**

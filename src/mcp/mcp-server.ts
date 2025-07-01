@@ -23,7 +23,7 @@ const program = new Command();
 program
   .name('vibecli-mcp-server')
   .description('VibeCLI MCP服务器 - AI驱动的Web全栈应用CLI工具')
-  .version('1.4.0')
+  .version('1.5.0')
   .option('--debug', '启用调试模式')
   .option('--no-telemetry', '禁用遥测')
   .parse();
@@ -33,7 +33,7 @@ const options = program.opts();
 // 创建MCP服务器
 const server = new McpServer({
   name: 'vibecli-mcp',
-  version: '1.4.0'
+  version: '1.5.0'
 });
 
 // 初始化核心组件
@@ -436,8 +436,8 @@ server.registerTool(
       // 1. 获取或创建MCP会话
       const sessionId = session_context.session_id || mcpContextManager.startSession();
       
-      // 2. 记录用户输入并进行上下文感知分析
-      const contextAnalysis = mcpContextManager.recordUserInput(sessionId, user_input);
+      // 2. 记录用户输入并进行上下文感知分析（异步版本）
+      const contextAnalysis = await mcpContextManager.recordUserInput(sessionId, user_input);
       
       // 3. 如果有之前的工具调用结果，学习并更新上下文
       if (session_context.previous_tool_calls) {

@@ -1,16 +1,29 @@
-# VibeCLI v1.3.0 - MCP智能提示词生成系统
+# VibeCLI v1.5.0 - 智能模板匹配与降级处理系统
 
 VibeCLI 是一个AI驱动的命令行工具，通过**Model Context Protocol (MCP)**协议提供智能项目分析和代码生成能力。它基于 Next.js、TypeScript、Prisma 和行业最佳实践，结合多轮对话上下文进行智能匹配，为开发者提供个性化的Web全栈应用开发体验。
 
-## 🎯 v1.3.0 核心特性
+## 🎯 v1.5.0 重大更新
 
-- **🧠 MCP智能上下文管理** - 通过多轮对话渐进式理解用户意图
-- **🎨 智能模板匹配** - 基于对话上下文自动选择最适合的提示词模板  
-- **📊 上下文感知置信度计算** - 动态评估理解程度并提供澄清建议
-- **💾 会话状态管理** - 支持跨对话轮次的项目信息累积
-- **🔍 智能特征提取** - 自动识别项目类型、技术偏好和复杂度
+### 🧠 智能模板匹配系统
+- **多层次匹配策略** - 精确匹配、特征匹配、相似度匹配、动态生成和智能降级
+- **需求特征提取** - 深度分析用户描述，识别核心业务需求和技术特性
+- **模板相似度评分** - 智能计算模板与需求的匹配度，提供最佳推荐
 
-VibeCLI v1.3 不再依赖外部AI服务，而是**使用MCP协议的原生上下文能力**进行智能分析和决策，确保隐私安全的同时提供卓越的开发体验。
+### 🎭 智能降级处理机制
+- **混合方案** - 当无完美匹配时，智能组合多个模板特性
+- **渐进式构建** - 复杂需求分阶段实现，降低开发风险
+- **定制指导** - 独特需求提供专业的定制开发指导
+- **社区方案** - 推荐相关开源解决方案和最佳实践
+
+### 🤖 交互式需求澄清
+- **智能问题生成** - 基于缺失信息自动生成澄清问题
+- **上下文感知选项** - 提供具体的选择项和影响分析
+- **决策辅助** - 为关键技术决策提供利弊分析
+
+### 🔧 跨平台目录管理 (v1.4.0继承)
+- **默认目录策略** - Mac: `~/Development/VibeCLI`, Windows: `~/Documents/VibeCLI`
+- **智能权限检查** - 自动验证目录权限并创建必要路径
+- **清晰位置提示** - 明确告知用户文件生成位置和启动方式
 
 ## 开发者指南
 
@@ -18,11 +31,11 @@ VibeCLI 的核心是创建完整的 Next.js 应用，预配置了 TypeScript、P
 
 ## 🚀 快速开始
 
-### 安装 VibeCLI v1.3.0
+### 安装 VibeCLI v1.5.0
 
 ```bash
 # 全局安装最新版本
-npm install -g vibe-cli-tool@1.3.0
+npm install -g vibe-cli-tool@1.5.0
 
 # 启动MCP智能提示词生成服务器
 vibecli-mcp-server
@@ -38,32 +51,50 @@ vibecli-mcp-server
 
 完整示例和文档请查看 [examples/](./examples/) 目录，详细架构信息请参考 [ARCHITECTURE.md](ARCHITECTURE.md)。
 
-## 🧠 MCP智能提示词生成系统
+## 🧠 智能模板匹配与项目生成系统
 
-VibeCLI v1.3.0 实现了革命性的**MCP智能提示词生成系统**，通过多轮对话上下文进行智能匹配，自动生成专业级开发指导提示词。系统使用MCP协议的原生上下文能力，确保隐私安全和响应速度。
+VibeCLI v1.5.0 实现了革命性的**智能模板匹配系统**，能够处理任何类型的项目需求。即使没有完美匹配的模板，系统也会提供智能的降级方案和详细的实施指导。
 
-### 🎯 智能提示词生成核心功能
+### 🎯 核心智能功能
 
-- **📝 多轮对话分析**: 渐进式理解用户项目需求和技术偏好
-- **🎨 上下文感知模板选择**: 自动匹配最适合的VibeCLI提示词模板
-- **📊 智能置信度评估**: 动态评估理解程度，提供精准的澄清问题
-- **💡 项目类型智能识别**: 支持电商、SaaS、博客、作品集、仪表板等项目类型
-- **⚙️ 技术栈自动推荐**: 基于项目复杂度和用户经验智能推荐技术组合
+#### 📝 多层次模板匹配
+- **精确匹配**: 直接命中现有模板 (80%+ 匹配度)
+- **特征匹配**: 基于功能需求组合模板 (60-80% 匹配度)  
+- **相似度匹配**: 使用最接近的模板作为基础 (40-60% 匹配度)
+- **动态生成**: 生成定制化实施方案 (< 40% 匹配度)
+- **智能降级**: 提供替代方案和详细指导
+
+#### 🤖 智能需求分析
+- **业务类型识别**: 电商、SaaS、博客、作品集、仪表板等
+- **功能特征提取**: 认证、支付、搜索、分析、实时通信等
+- **技术栈推荐**: 基于项目复杂度和用户经验智能匹配
+- **复杂度评估**: 自动估算开发时间和技术难度
+
+#### 🎭 智能降级处理
+- **混合方案**: 组合多个模板特性，覆盖90%+需求
+- **渐进式实施**: 复杂项目分阶段开发，降低风险
+- **定制指导**: 提供专业的架构设计和实施建议
+- **资源推荐**: 相关库、文档、教程和社区资源
+
+#### 💬 交互式澄清系统
+- **智能问题生成**: 基于缺失信息自动生成具体问题
+- **上下文感知选项**: 提供详细的选择说明和影响分析
+- **决策辅助工具**: 技术选型的利弊对比和推荐理由
 
 ### 📦 MCP 安装
 
 #### NPM 全局安装
 ```bash
-npm install -g vibe-cli-tool@1.3.0
+npm install -g vibe-cli-tool@1.5.0
 ```
 
-> **当前版本**: v1.3.0 🎉  
+> **当前版本**: v1.5.0 🎉  
 > **包地址**: https://www.npmjs.com/package/vibe-cli-tool  
-> **新特性**: MCP智能提示词生成系统
+> **新特性**: 智能模板匹配与降级处理系统
 
 #### NPX 临时使用
 ```bash
-npx --package=vibe-cli-tool@1.3.0 vibecli-mcp-server
+npx --package=vibe-cli-tool@1.5.0 vibecli-mcp-server
 ```
 
 #### 从源码安装
@@ -84,10 +115,10 @@ npm run mcp:dev
 vibecli-mcp-server
 
 # 或使用 npx 临时运行  
-npx --package=vibe-cli-tool@1.3.0 vibecli-mcp-server
+npx --package=vibe-cli-tool@1.5.0 vibecli-mcp-server
 
 # 调试模式
-npx --package=vibe-cli-tool@1.3.0 vibecli-mcp-server --debug
+npx --package=vibe-cli-tool@1.5.0 vibecli-mcp-server --debug
 ```
 
 #### 2. 配置 MCP 客户端
@@ -100,7 +131,7 @@ npx --package=vibe-cli-tool@1.3.0 vibecli-mcp-server --debug
   "mcpServers": {
     "vibecli": {
       "command": "npx",
-      "args": ["-y", "--package=vibe-cli-tool@1.3.0", "vibecli-mcp-server"],
+      "args": ["-y", "--package=vibe-cli-tool@1.5.0", "vibecli-mcp-server"],
       "env": {
         "NODE_ENV": "production"
       }
@@ -117,7 +148,7 @@ npx --package=vibe-cli-tool@1.3.0 vibecli-mcp-server --debug
   "mcpServers": {
     "vibecli": {
       "command": "npx",
-      "args": ["-y", "--package=vibe-cli-tool@1.3.0", "vibecli-mcp-server"],
+      "args": ["-y", "--package=vibe-cli-tool@1.5.0", "vibecli-mcp-server"],
       "env": {
         "NODE_ENV": "production"
       }
