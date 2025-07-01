@@ -104,3 +104,49 @@ export interface ProjectStatus {
   database: string
   version: string
 }
+
+// 提示词相关类型定义
+export interface PromptGenerationConfig {
+  userDescription: string
+  projectType?: string
+  detectedFeatures?: string[]
+  complexityLevel?: 'simple' | 'medium' | 'complex'
+  techStack?: string[]
+  projectContext?: ProjectConfig
+}
+
+export interface PromptGenerationResult {
+  success: boolean
+  prompt: string
+  metadata: {
+    projectType: string
+    detectedFeatures: string[]
+    confidenceScore: number
+    templateUsed: string
+    generatedAt: string
+  }
+  error?: string
+}
+
+export interface PromptTemplate {
+  id: string
+  name: string
+  projectType: string
+  templatePath: string
+  variables: string[]
+  description: string
+}
+
+export interface PromptContext {
+  project_name: string
+  project_type: string
+  complexity_level: string
+  detected_features: string[]
+  tech_stack: string
+  vibecli_version: string
+  has_payment_feature?: boolean
+  has_billing_feature?: boolean
+  has_search_feature?: boolean
+  current_date: string
+  [key: string]: any
+}
