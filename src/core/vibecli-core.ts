@@ -2,6 +2,7 @@
 
 import fs from 'fs-extra'
 import path from 'path'
+import os from 'os'
 import { execSync } from 'child_process'
 import Mustache from 'mustache'
 import crypto from 'crypto'
@@ -23,6 +24,81 @@ import {
 } from './types.js'
 import { validateProjectName, validateProjectDirectory } from '../utils/validation.js'
 
+/**
+ * 获取跨平台的默认项目目录
+ */
+function getDefaultProjectDirectory(): string {
+  const homeDir = os.homedir()
+  const platform = os.platform()
+  
+  switch (platform) {
+    case 'darwin': // Mac
+      return path.join(homeDir, 'Development', 'VibeCLI')
+    case 'win32': // Windows  
+      return path.join(homeDir, 'Documents', 'VibeCLI')
+    default: // Linux等
+      return path.join(homeDir, 'Projects', 'VibeCLI')
+  }
+}
+
+/**
+ * 确保目录存在，如果不存在则创建
+ */
+async function ensureDirectoryExists(dirPath: string): Promise<void> {
+  try {
+    await fs.ensureDir(dirPath)
+  } catch (error) {
+    throw new Error(`无法创建目录 ${dirPath}: ${error instanceof Error ? error.message : '未知错误'}`)
+  }
+}
+
+/**
+ * 验证目录权限
+ */
+async function validateDirectoryPermissions(dirPath: string): Promise<boolean> {
+  try {
+    // 尝试在目录中创建一个临时文件来测试写入权限
+    const testFile = path.join(dirPath, '.vibecli-test')
+    await fs.writeFile(testFile, 'test')
+    await fs.remove(testFile)
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
+/**
+ * 获取平台特定的启动指令
+ */
+function getPlatformSpecificInstructions(projectPath: string): string[] {
+  const platform = os.platform()
+  const relativePath = path.basename(projectPath)
+  
+  const instructions = [
+    '📋 下一步操作:',
+    '1. 打开终端 (Terminal)',
+    `2. 进入项目目录:`
+  ]
+  
+  if (platform === 'win32') {
+    instructions.push(`   cd "${projectPath}"`)
+  } else {
+    instructions.push(`   cd "${projectPath}"`)
+  }
+  
+  instructions.push(
+    '3. 安装依赖:',
+    '   npm install',
+    '4. 启动开发服务器:',
+    '   npm run dev', 
+    '5. 打开浏览器访问: http://localhost:3000',
+    '',
+    '💡 提示: 您也可以直接在文件管理器中打开项目文件夹进行开发'
+  )
+  
+  return instructions
+}
+
 export class VibeCLICore {
   /**
    * 创建新项目
@@ -42,7 +118,33 @@ export class VibeCLICore {
         }
       }
 
-      const projectPath = config.targetDirectory || path.resolve(process.cwd(), config.name)
+      // 使用跨平台默认目录逻辑
+      let projectPath: string
+      if (config.targetDirectory) {
+        // 用户指定了目录，直接使用
+        projectPath = path.resolve(config.targetDirectory, config.name)
+      } else {
+        // 使用默认目录
+        const defaultBaseDir = getDefaultProjectDirectory()
+        projectPath = path.join(defaultBaseDir, config.name)
+      }
+
+      // 确保父目录存在
+      const parentDir = path.dirname(projectPath)
+      await ensureDirectoryExists(parentDir)
+
+      // 验证目录权限
+      const hasPermissions = await validateDirectoryPermissions(parentDir)
+      if (!hasPermissions) {
+        return {
+          success: false,
+          projectPath,
+          message: '目录权限不足',
+          generatedFiles: [],
+          nextSteps: [],
+          error: `没有权限在 ${parentDir} 创建项目。请检查目录权限或选择其他位置。`
+        }
+      }
 
       // 检查目录是否存在
       if (fs.existsSync(projectPath) && !config.overwrite) {
@@ -52,7 +154,7 @@ export class VibeCLICore {
           message: '目标目录已存在',
           generatedFiles: [],
           nextSteps: [],
-          error: `Directory ${config.name} already exists. Use overwrite option to replace it.`
+          error: `目录 ${config.name} 已存在于 ${parentDir}。请使用不同的项目名称或启用覆盖选项。`
         }
       }
 
@@ -77,16 +179,21 @@ export class VibeCLICore {
         projectPath,
         message: '项目创建成功',
         generatedFiles,
-        nextSteps: [
-          `cd ${config.name}`,
-          'npm run dev',
-          '打开 http://localhost:3000'
-        ]
+        nextSteps: getPlatformSpecificInstructions(projectPath)
       }
     } catch (error) {
+      // 构建错误情况下的项目路径
+      let errorProjectPath: string
+      if (config.targetDirectory) {
+        errorProjectPath = path.resolve(config.targetDirectory, config.name)
+      } else {
+        const defaultBaseDir = getDefaultProjectDirectory()
+        errorProjectPath = path.join(defaultBaseDir, config.name)
+      }
+
       return {
         success: false,
-        projectPath: config.targetDirectory || path.resolve(process.cwd(), config.name),
+        projectPath: errorProjectPath,
         message: '项目创建失败',
         generatedFiles: [],
         nextSteps: [],

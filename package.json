@@ -1,7 +1,7 @@
 {
   "name": "vibe-cli-tool",
-  "version": "1.3.0",
-  "description": "VibeCLI v1.3 - MCP智能提示词生成系统，通过多轮对话上下文进行智能匹配的Web全栈应用CLI工具",
+  "version": "1.4.0",
+  "description": "VibeCLI v1.4.0 - 智能跨平台目录管理 + MCP智能提示词生成系统，Web全栈应用CLI工具",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

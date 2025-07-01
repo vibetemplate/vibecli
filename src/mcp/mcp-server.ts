@@ -11,6 +11,8 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 import { Command } from 'commander';
+import os from 'os';
+import path from 'path';
 import { VibeCLICore } from '../core/vibecli-core.js';
 import { promptTemplateEngine } from '../prompts/dynamic/template-engine.js';
 import { mcpContextManager } from './mcp-context-manager.js';
@@ -21,7 +23,7 @@ const program = new Command();
 program
   .name('vibecli-mcp-server')
   .description('VibeCLI MCP服务器 - AI驱动的Web全栈应用CLI工具')
-  .version('1.2.4')
+  .version('1.4.0')
   .option('--debug', '启用调试模式')
   .option('--no-telemetry', '禁用遥测')
   .parse();
@@ -31,11 +33,36 @@ const options = program.opts();
 // 创建MCP服务器
 const server = new McpServer({
   name: 'vibecli-mcp',
-  version: '1.2.4'
+  version: '1.4.0'
 });
 
 // 初始化核心组件
 const vibecliCore = new VibeCLICore();
+
+// 辅助函数：获取默认项目目录（与core中保持一致）
+function getDefaultProjectDirectory(): string {
+  const homeDir = os.homedir()
+  const platform = os.platform()
+  
+  switch (platform) {
+    case 'darwin': // Mac
+      return path.join(homeDir, 'Development', 'VibeCLI')
+    case 'win32': // Windows  
+      return path.join(homeDir, 'Documents', 'VibeCLI')
+    default: // Linux等
+      return path.join(homeDir, 'Projects', 'VibeCLI')
+  }
+}
+
+// 辅助函数：获取项目预计生成位置
+function getProjectTargetPath(projectName: string, targetDirectory?: string): string {
+  if (targetDirectory) {
+    return path.resolve(targetDirectory, projectName)
+  } else {
+    const defaultBaseDir = getDefaultProjectDirectory()
+    return path.join(defaultBaseDir, projectName)
+  }
+}
 
 // 辅助函数：确定模板类型
 function determineTemplate(projectType: string): string {
@@ -202,13 +229,15 @@ server.registerTool(
         }).optional()
       }).describe('来自project_analyzer的分析结果'),
       project_name: z.string().regex(/^[a-zA-Z0-9-_]+$/).describe('项目名称（符合文件命名规范）'),
-      target_directory: z.string().optional().describe('目标生成目录'),
-      customizations: z.object({}).optional().describe('定制化选项')
+      target_directory: z.string().optional().describe('目标生成目录（可选，不指定将使用系统默认位置）')
     }
   },
-  async ({ analysis_result, project_name, target_directory, customizations = {} }) => {
+  async ({ analysis_result, project_name, target_directory }) => {
     try {
-      console.error('🚀 正在生成项目模板...');
+      // 显示预计生成位置
+      const targetPath = getProjectTargetPath(project_name, target_directory)
+      console.error('🚀 正在生成项目模板...')
+      console.error(`📁 项目将创建在: ${targetPath}`);
       
       const projectConfig: ProjectConfig = {
         name: project_name,
@@ -231,20 +260,16 @@ server.registerTool(
       return {
         content: [{
           type: 'text',
-          text: `✅ **项目生成成功**
+          text: `✅ **项目生成成功！**
 
-**项目名称**: ${project_name}
-**生成路径**: ${result.projectPath}
-**模板类型**: ${projectConfig.template}
-**数据库**: ${projectConfig.database}
+📁 **项目位置**: ${result.projectPath}
+🎯 **项目类型**: ${projectConfig.template}
+💾 **数据库**: ${projectConfig.database}
 
 **生成的文件**:
 ${result.generatedFiles.map((file: string) => `• ${file}`).join('\n')}
 
-**下一步**:
-1. \`cd ${result.projectPath}\`
-2. \`npm install\`
-3. \`npm run dev\`
+${result.nextSteps.join('\n')}
 
 💡 使用 \`feature_composer\` 工具添加更多功能模块。`
         }]
@@ -482,7 +507,7 @@ server.registerTool(
           projectType: promptConfig.projectType || 'blog',
           techPreferences: promptConfig.techStack || []
         }, promptConfig),
-        vibecli_version: '1.3.0',
+        vibecli_version: '1.4.0',
         current_date: new Date().toLocaleDateString('zh-CN'),
         // 基于MCP上下文的智能特性标志
         has_payment_feature: promptConfig.detectedFeatures?.includes('payment') || false,
