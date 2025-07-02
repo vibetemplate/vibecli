@@ -16,7 +16,13 @@ export default {
   transformIgnorePatterns: [
     'node_modules/(?!(chalk|inquirer|ora|execa|@modelcontextprotocol)/)'
   ],
-  moduleNameMapping: {
+  moduleNameMapper: {
+    'inquirer': '<rootDir>/src/__tests__/fixtures/inquirer-mock.ts',
+    '^chalk$': '<rootDir>/src/__tests__/fixtures/chalk-mock.ts',
+    '^ora$': '<rootDir>/src/__tests__/fixtures/ora-mock.ts',
+    '^execa$': '<rootDir>/src/__tests__/fixtures/execa-mock.ts',
+    '^fs-extra$': '<rootDir>/src/__tests__/fixtures/fs-extra-mock.ts',
+    '^../core/vibecli-core\.js$': '<rootDir>/src/__tests__/fixtures/vibecli-core-mock.ts',
     '^(\\.{1,2}/.*)\\.js$': '$1'
   },
   collectCoverageFrom: [

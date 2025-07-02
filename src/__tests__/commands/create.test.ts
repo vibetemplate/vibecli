@@ -122,6 +122,7 @@ describe('create command', () => {
       const projectName = 'test-project'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'postgresql',
         features: ['auth'],
@@ -158,6 +159,7 @@ describe('create command', () => {
       const projectName = 'tailwind-project'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'mysql',
         features: ['auth', 'admin'],
@@ -189,6 +191,7 @@ describe('create command', () => {
       const projectName = 'install-test'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'sqlite',
         features: [],
@@ -207,6 +210,7 @@ describe('create command', () => {
       const projectName = 'prisma-test'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'postgresql',
         features: [],
@@ -225,6 +229,7 @@ describe('create command', () => {
       const projectName = 'sqlite-test'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'sqlite',
         features: [],
@@ -244,6 +249,7 @@ describe('create command', () => {
       const projectName = 'error-test'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'postgresql',
         features: [],
@@ -264,6 +270,7 @@ describe('create command', () => {
       const projectName = 'install-error-test'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'sqlite',
         features: [],

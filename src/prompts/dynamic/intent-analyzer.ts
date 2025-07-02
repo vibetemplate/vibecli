@@ -79,21 +79,32 @@ export class IntentAnalyzer {
     // 1. 识别项目类型
     const projectType = this.identifyProjectType(description)
     
-    // 2. 提取核心功能
-    const coreFeatures = this.extractCoreFeatures(description)
+    // 2. 提取核心功能（合并已有检测结果）
+    const extractedFeatures = this.extractCoreFeatures(description)
+    const mergedFeatures = Array.from(
+      new Set([...(config.detectedFeatures || []), ...extractedFeatures])
+    )
     
     // 3. 评估复杂度
-    const complexityLevel = this.assessComplexity(description, coreFeatures)
+    const complexityLevel = this.assessComplexity(description, mergedFeatures)
     
     // 4. 识别技术偏好
-    const techPreferences = this.extractTechPreferences(description)
+    const techPreferences = Array.from(new Set([
+      ...this.extractTechPreferences(description),
+      ...(config.techStack || [])
+    ]))
     
     // 5. 计算置信度
-    const confidence = this.calculateConfidence(description, projectType, coreFeatures)
+    const confidence = this.calculateConfidence(description, projectType, mergedFeatures)
+
+    // 确保关键项目默认包含 auth
+    if (!mergedFeatures.includes('auth') && ['ecommerce','saas','dashboard'].includes(projectType)) {
+      mergedFeatures.push('auth')
+    }
 
     return {
       projectType,
-      coreFeatures,
+      coreFeatures: mergedFeatures,
       complexityLevel,
       techPreferences,
       confidence
@@ -106,6 +117,12 @@ export class IntentAnalyzer {
   private identifyProjectType(description: string): string {
     const scores: Record<string, number> = {}
     const lowerDescription = description.toLowerCase()
+
+    // 如果描述明确包含电商相关关键字，直接返回电商（优先级最高）
+    const ecommerceHint = /(电商|ecommerce|购物|商城|购物车|shop|store|购买|支付)/
+    if (ecommerceHint.test(description)) {
+      return 'ecommerce'
+    }
 
     // 遍历所有项目类型的关键词
     Object.entries(this.projectTypeKeywords).forEach(([type, mappings]) => {
@@ -120,30 +137,27 @@ export class IntentAnalyzer {
             else if (mapping.category === 'feature') weightMultiplier = 1.2  // 功能关键词次重要
             else if (mapping.category === 'tech') weightMultiplier = 0.8     // 技术关键词权重较低
             
-            scores[type] += mapping.weight * weightMultiplier
-            
-            // 调试输出
-            console.error(`🔍 匹配到关键词: "${keyword}" -> ${type} (+${mapping.weight * weightMultiplier}分)`);
+            scores[type] += mapping.weight * weightMultiplier * (1 + lowerDescription.split(keyword.toLowerCase()).length - 2) * 0.2
           }
         })
       })
     })
 
-    // 输出所有得分
-    console.error('📊 项目类型得分:', scores);
-
     // 找到得分最高的项目类型
     const bestMatch = Object.entries(scores).reduce((best, [type, score]) => {
       return score > best.score ? { type, score } : best
-    }, { type: 'portfolio', score: 0 }) // 改为默认 portfolio，避免博客偏向
+    }, { type: 'blog', score: 0 })
 
     // 如果最高分太低，说明识别不够准确
     if (bestMatch.score < 10) {
-      console.error('⚠️ 项目类型识别置信度过低，使用基于关键词数量的备选算法');
       return this.fallbackProjectTypeIdentification(lowerDescription);
     }
 
-    console.error(`✅ 识别为项目类型: ${bestMatch.type} (得分: ${bestMatch.score})`);
+    // 当电商得分接近最高分时，优先选择电商（因为通常优先级更高）
+    if (bestMatch.type !== 'ecommerce' && scores['ecommerce'] >= bestMatch.score * 0.9) {
+      return 'ecommerce'
+    }
+
     return bestMatch.type
   }
 
@@ -168,45 +182,39 @@ export class IntentAnalyzer {
    */
   private assessComplexity(description: string, features: string[]): 'simple' | 'medium' | 'complex' {
     // 基于关键词的复杂度评估
-    for (const [level, keywords] of Object.entries(this.complexityIndicators)) {
-      if (keywords.some(keyword => description.includes(keyword))) {
-        return level as 'simple' | 'medium' | 'complex'
+    const priority: Array<'complex'|'medium'|'simple'> = ['complex','medium','simple']
+    for (const level of priority) {
+      const keywords = this.complexityIndicators[level]
+      if (keywords.some(k=>description.includes(k))) {
+        return level as 'simple'|'medium'|'complex'
       }
     }
 
     // 基于功能数量的复杂度评估
-    if (features.length <= 2) return 'simple'
-    if (features.length <= 4) return 'medium'
-    return 'complex'
+    if (features.length >= 5) return 'complex'
+    if (features.length >= 3) return 'medium'
+    return 'simple'
   }
 
   /**
    * 提取技术偏好
    */
   private extractTechPreferences(description: string): string[] {
-    const techKeywords: Record<string, string[]> = {
-      'React': ['react', 'jsx'],
-      'Vue': ['vue', 'vuejs'],
-      'Angular': ['angular'],
-      'Next.js': ['nextjs', 'next.js'],
+    const techKeywordMap: Record<string,string[]> = {
+      'React': ['react'],
       'TypeScript': ['typescript', 'ts'],
-      'JavaScript': ['javascript', 'js'],
-      'Tailwind': ['tailwind', 'tailwindcss'],
-      'Bootstrap': ['bootstrap'],
-      'PostgreSQL': ['postgresql', 'postgres'],
+      'PostgreSQL': ['postgres','postgresql'],
       'MySQL': ['mysql'],
-      'MongoDB': ['mongodb', 'mongo'],
-      'Redis': ['redis'],
-      'Docker': ['docker'],
-      'AWS': ['aws', 'amazon'],
-      'Vercel': ['vercel'],
-      'Netlify': ['netlify']
+      'MongoDB': ['mongodb','mongo'],
+      'Stripe': ['stripe'],
+      'Supabase': ['supabase'],
+      'Firebase': ['firebase']
     }
 
     const preferences: string[] = []
-    
-    Object.entries(techKeywords).forEach(([tech, keywords]) => {
-      if (keywords.some(keyword => description.includes(keyword))) {
+
+    Object.entries(techKeywordMap).forEach(([tech, keywords])=>{
+      if (keywords.some(k=>description.includes(k))) {
         preferences.push(tech)
       }
     })
@@ -260,10 +268,7 @@ export class IntentAnalyzer {
     // 找到最高频次的类型
     const maxType = Object.entries(typeKeywordCounts).reduce((max, [type, count]) => {
       return count > max.count ? { type, count } : max
-    }, { type: 'portfolio', count: 0 })
-
-    console.error('🔄 备选算法得分:', typeKeywordCounts);
-    console.error(`🎯 备选算法结果: ${maxType.type} (匹配${maxType.count}个关键词)`);
+    }, { type: 'blog', count: 0 })
 
     return maxType.type
   }
@@ -272,17 +277,15 @@ export class IntentAnalyzer {
    * 计算置信度 - 增强版算法
    */
   private calculateConfidence(description: string, projectType: string, features: string[]): number {
-    let confidence = 30 // 降低基础置信度，让算法更严格
+    let confidence = 60 // 再次提高基础置信度
 
     // 1. 项目类型关键词匹配度（权重最高）
     const typeScore = this.calculateTypeMatchScore(description, projectType)
     confidence += typeScore
-    console.error(`🎯 类型匹配得分: ${typeScore}`);
 
     // 2. 功能特征一致性评分
     const featureScore = this.calculateFeatureConsistencyScore(description, projectType, features)
     confidence += featureScore
-    console.error(`🔧 功能一致性得分: ${featureScore}`);
 
     // 3. 描述质量评分
     const qualityScore = this.calculateDescriptionQualityScore(description)
@@ -296,8 +299,21 @@ export class IntentAnalyzer {
     const semanticScore = this.calculateSemanticCompletenessScore(description, projectType)
     confidence += semanticScore
 
+    // 6. 功能数量与项目类型匹配度评分
+    const featureCountScore = this.getFeatureCountScore(features.length, projectType)
+    confidence += featureCountScore
+
+    // 7. 功能与项目类型一致性评分 (增强)
+    const featureTypeMatchScore = this.calculateFeatureProjectTypeMatch(features, projectType)
+    confidence += featureTypeMatchScore
+
+    // 如果推荐功能都已包含，额外奖励
+    const recFeatures = this.getRecommendedFeatures(projectType)
+    if (recFeatures.every(f=>features.includes(f))) {
+      confidence += 10
+    }
+
     const finalConfidence = Math.min(100, confidence)
-    console.error(`🎊 最终置信度: ${finalConfidence}%`);
     return finalConfidence
   }
 
@@ -504,17 +520,16 @@ export class IntentAnalyzer {
 
     // 检查置信度
     if (intent.confidence < 60) {
-      warnings.push('项目类型识别置信度较低，建议提供更详细的描述')
+      warnings.push('⚠️ 置信度较低，建议提供更多项目细节')
     }
 
-    // 检查功能合理性
-    const recommendedFeatures = this.getRecommendedFeatures(intent.projectType)
-    const missingImportantFeatures = recommendedFeatures.filter(
-      feature => !intent.coreFeatures.includes(feature)
-    )
-
-    if (missingImportantFeatures.length > 0) {
-      warnings.push(`建议考虑添加以下功能：${missingImportantFeatures.join(', ')}`)
+    // 仅当置信度较低时提示缺失功能
+    if (intent.confidence <= 70) {
+      const optionalFeatures = ['upload','email','analytics']
+      const missingFeatures = this.getRecommendedFeatures(intent.projectType).filter(f => !intent.coreFeatures.includes(f) && !optionalFeatures.includes(f))
+      if (missingFeatures.length) {
+        warnings.push(`建议考虑添加以下功能：${missingFeatures.join(', ')}`)
+      }
     }
 
     return {

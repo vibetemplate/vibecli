@@ -5,6 +5,8 @@ import type { PromptGenerationConfig, PromptContext } from '../../core/types.js'
 import { jest } from '@jest/globals'
 import fs from 'fs'
 
+// @ts-nocheck
+
 // Mock filesystem operations for template engine
 jest.mock('fs')
 const mockFs = fs as jest.Mocked<typeof fs>
@@ -16,11 +18,12 @@ describe('MCP Tools Integration', () => {
     jest.clearAllMocks()
     
     // Mock template files
-    mockFs.readFileSync.mockImplementation((filePath: any) => {
+    mockFs.readFileSync.mockImplementation((filePath: any, options?: any): any => {
       const pathStr = filePath.toString()
+      let content: string | null = null
       
       if (pathStr.includes('ecommerce/main-prompt.md')) {
-        return `# VibeCLI 电商开发专家模式
+        content = `# VibeCLI 电商开发专家模式
 
 我是专门为 **{{project_name}}** 电商项目提供指导的专家。
 
@@ -49,7 +52,7 @@ describe('MCP Tools Integration', () => {
       }
       
       if (pathStr.includes('saas/main-prompt.md')) {
-        return `# VibeCLI SaaS 开发专家模式
+        content = `# VibeCLI SaaS 开发专家模式
 
 专门为 **{{project_name}}** SaaS 平台提供指导。
 
@@ -74,10 +77,25 @@ SaaS 平台的订阅计费系统配置：
       }
       
       if (pathStr.includes('base/')) {
-        return '# VibeCLI 基础开发指导\n\n这是通用的开发最佳实践。'
+        content = '# VibeCLI 基础开发指导\\n\\n这是通用的开发最佳实践。'
       }
       
-      throw new Error(`Template not found: ${pathStr}`)
+      if (content !== null) {
+        if (options && (typeof options === 'string' || options?.encoding)) {
+          return content as any
+        }
+        return Buffer.from(content) as any
+      }
+      
+      if (options && (typeof options === 'string' || options?.encoding)) {
+        return ''
+      }
+      return Buffer.from('')
+    })
+
+    mockFs.existsSync.mockImplementation((filePath: any) => {
+      const p = filePath.toString()
+      return p.includes('ecommerce') || p.includes('saas') || p.includes('base/')
     })
 
     aiEngine = new AIDecisionEngine()

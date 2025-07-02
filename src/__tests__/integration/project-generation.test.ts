@@ -61,6 +61,7 @@ describe('项目生成集成测试', () => {
       const projectName = 'default-test-app'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'postgresql',
         features: ['auth', 'upload'],
@@ -117,6 +118,7 @@ describe('项目生成集成测试', () => {
       const projectName = 'mysql-test-app'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'mysql',
         features: [],
@@ -138,6 +140,7 @@ describe('项目生成集成测试', () => {
       const projectName = 'sqlite-test-app'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'sqlite',
         features: [],
@@ -161,6 +164,7 @@ describe('项目生成集成测试', () => {
       const projectName = 'tailwind-test-app'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'sqlite',
         features: [],
@@ -204,6 +208,7 @@ describe('项目生成集成测试', () => {
       const projectName = 'features-test-app'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'postgresql',
         features: ['auth', 'admin', 'upload', 'email'],
@@ -229,6 +234,7 @@ describe('项目生成集成测试', () => {
       const projectName = 'typescript-test-app'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'sqlite',
         features: [],
@@ -257,6 +263,7 @@ describe('项目生成集成测试', () => {
       const projectName = 'order-test-app'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'postgresql',
         features: [],
@@ -286,6 +293,7 @@ describe('项目生成集成测试', () => {
       const projectName = 'fs-error-test'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'sqlite',
         features: [],
@@ -304,6 +312,7 @@ describe('项目生成集成测试', () => {
       const projectName = 'install-error-test'
 
       mockInquirer.prompt.mockResolvedValueOnce({
+        overwrite: true,
         template: 'default',
         database: 'sqlite',
         features: [],
