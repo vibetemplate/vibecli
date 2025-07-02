@@ -17,5 +17,5 @@ export type {
   ValidationResult 
 } from './core/types.js'
 
-// 版本信息
-export const version = '1.7.1' 
+// 版本信息 - 从 package.json 读取
+export { version } from './utils/version.js' 

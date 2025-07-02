@@ -6,13 +6,14 @@ import { createApp } from './commands/create.js'
 import { addFeature } from './commands/add.js'
 import { deployApp } from './commands/deploy.js'
 import { generateApi } from './commands/generate.js'
+import { version } from './utils/version.js'
 
 const program = new Command()
 
 program
   .name('vibecli')
   .description('VibeCLI - AI驱动的Web全栈应用CLI工具')
-  .version('1.7.1')
+  .version(version)
 
 // 创建新应用
 program

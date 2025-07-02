@@ -22,7 +22,13 @@
     "format:check": "prettier --check src/**/*.ts",
     "clean": "rm -rf dist",
     "mcp:server": "node dist/mcp-server.js",
-    "mcp:dev": "tsc && npm run mcp:server"
+    "mcp:dev": "tsc && npm run mcp:server",
+    "version:patch": "npm version patch && npm run build",
+    "version:minor": "npm version minor && npm run build",
+    "version:major": "npm version major && npm run build",
+    "release:patch": "npm run version:patch && npm publish && git push --follow-tags",
+    "release:minor": "npm run version:minor && npm publish && git push --follow-tags",
+    "release:major": "npm run version:major && npm publish && git push --follow-tags"
   },
   "keywords": [
     "web",
