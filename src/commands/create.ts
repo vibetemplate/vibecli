@@ -182,11 +182,11 @@ async function promptForConfig(projectName: string, options: CreateOptions, incl
       name: 'database',
       message: '选择数据库:',
       choices: [
-        { name: 'PostgreSQL (推荐)', value: 'postgresql' },
-        { name: 'MySQL', value: 'mysql' },
-        { name: 'SQLite (开发)', value: 'sqlite' }
+        { name: 'SQLite (零配置，推荐)', value: 'sqlite' },
+        { name: 'PostgreSQL', value: 'postgresql' },
+        { name: 'MySQL', value: 'mysql' }
       ],
-      default: 'postgresql'
+      default: 'sqlite'
     })
   }
 

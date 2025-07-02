@@ -1,6 +1,7 @@
 import type { PromptGenerationConfig, PromptContext } from '../core/types.js'
 import { intelligentTemplateMatcher, type TemplateMatchResult, type RequirementFeature } from '../prompts/dynamic/intelligent-template-matcher.js'
 import { intelligentFallbackHandler, type FallbackResult } from '../prompts/dynamic/intelligent-fallback-handler.js'
+import { GlobalConfig } from './config/config-provider.js'
 
 /**
  * MCP上下文对话历史
@@ -278,16 +279,16 @@ export class MCPContextManager {
       currentMessage
     ].join(' ').toLowerCase()
 
-    // 新手指示词
-    const beginnerIndicators = [
-      '新手', '初学', '不懂', '学习', '教程', '怎么', '如何',
-      'beginner', 'new', 'learn', 'tutorial', 'how to'
+    const cfg = GlobalConfig.getConfig() as any
+    const indicatorCfg = (cfg.userExperienceIndicators ?? {}) as Record<string, string[]>
+    const beginnerIndicators = indicatorCfg.beginner ?? [
+      '新手','初学','不懂','学习','教程','怎么','如何',
+      'beginner','new','learn','tutorial','how to'
     ]
 
-    // 专家指示词
-    const expertIndicators = [
-      '架构', '优化', '性能', '扩展', '微服务', '高并发',
-      'architecture', 'optimize', 'scalable', 'microservice'
+    const expertIndicators = indicatorCfg.expert ?? [
+      '架构','优化','性能','扩展','微服务','高并发',
+      'architecture','optimize','scalable','microservice'
     ]
 
     const beginnerScore = beginnerIndicators.filter(word => allMessages.includes(word)).length
@@ -310,10 +311,14 @@ export class MCPContextManager {
       currentMessage
     ].join(' ').toLowerCase()
 
-    if (recentMessages.match(/计划|设计|规划|架构|plan|design/)) {
+    const phaseCfg = (GlobalConfig.getConfig() as any).developmentPhaseIndicators ?? {}
+    const planningRegex = new RegExp((phaseCfg.planning ?? ['计划','设计','规划','架构','plan','design']).join('|'))
+    const optimizationRegex = new RegExp((phaseCfg.optimization ?? ['优化','性能','部署','deploy','optimize']).join('|'))
+
+    if (recentMessages.match(planningRegex)) {
       return 'planning'
     }
-    if (recentMessages.match(/优化|性能|部署|deploy|optimize/)) {
+    if (recentMessages.match(optimizationRegex)) {
       return 'optimization'
     }
     return 'development' // 默认开发阶段

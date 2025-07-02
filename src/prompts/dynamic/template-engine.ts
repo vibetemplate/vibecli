@@ -1,10 +1,9 @@
-import { readFileSync } from 'fs'
+import { readFileSync, existsSync, readdirSync } from 'fs'
 import { join } from 'path'
 import Mustache from 'mustache'
 import type { PromptTemplate, PromptContext, PromptGenerationResult } from '../../core/types.js'
 import type { ProjectIntent } from './context-aware-template-selector.js'
 import { contextAwareTemplateSelector, type TemplateSelectionContext } from './context-aware-template-selector.js'
-import { existsSync } from 'fs'
 
 export class PromptTemplateEngine {
   private templatesPath: string
@@ -19,14 +18,16 @@ export class PromptTemplateEngine {
    * 加载所有可用的提示词模板
    */
   private loadTemplates() {
-    const projectTypes = ['ecommerce', 'saas', 'blog', 'portfolio', 'dashboard']
+    const projectTypes = this.discoverProjectTypes()
     
     projectTypes.forEach(type => {
+      const templateFile = join(this.templatesPath, type, 'main-prompt.md')
+
       const template: PromptTemplate = {
         id: `${type}-main`,
         name: `${type} 主提示词`,
         projectType: type,
-        templatePath: join(this.templatesPath, type, 'main-prompt.md'),
+        templatePath: templateFile,
         variables: this.extractTemplateVariables(type),
         description: `为 ${type} 项目类型生成专业开发指导提示词`
       }
@@ -35,12 +36,34 @@ export class PromptTemplateEngine {
   }
 
   /**
+   * 动态扫描模板目录，自动发现新的项目类型文件夹（包含 main-prompt.md）
+   */
+  private discoverProjectTypes(): string[] {
+    try {
+      // 尝试读取 templatesPath 下的所有子目录
+      const entries = readdirSync(this.templatesPath, { withFileTypes: true })
+      const dirs = entries
+        .filter((d) => d.isDirectory())
+        .map((d) => d.name)
+        .filter((dir) => existsSync(join(this.templatesPath, dir, 'main-prompt.md')))
+
+      // 如果没有扫描到任何模板，则回退到默认内置列表，兼容旧逻辑 & 测试
+      return dirs.length > 0
+        ? dirs
+        : ['ecommerce', 'saas', 'blog', 'portfolio', 'dashboard']
+    } catch (err) {
+      // 读目录失败时（例如测试环境 fs 被 mock），使用默认列表
+      return ['ecommerce', 'saas', 'blog', 'portfolio', 'dashboard']
+    }
+  }
+
+  /**
    * 提取模板中的变量（简化版本，实际可以通过解析模板文件获取）
    */
   private extractTemplateVariables(projectType: string): string[] {
     const commonVariables = [
       'project_name',
-      'project_type', 
+      'project_type',
       'complexity_level',
       'detected_features',
       'tech_stack',
@@ -48,15 +71,27 @@ export class PromptTemplateEngine {
       'current_date'
     ]
 
-    const typeSpecificVariables: Record<string, string[]> = {
-      ecommerce: ['has_payment_feature'],
-      saas: ['has_billing_feature'],
-      blog: ['has_search_feature'],
-      portfolio: [],
-      dashboard: []
+    const variables = new Set<string>(commonVariables)
+
+    try {
+      const templatePath = join(this.templatesPath, projectType, 'main-prompt.md')
+      if (existsSync(templatePath)) {
+        const content = readFileSync(templatePath, 'utf-8')
+        // 匹配 Mustache/Handlebars 变量，例如 {{variable}} 或 {{#section}}
+        const regex = /{{\s*#?\/?\s*([a-zA-Z0-9_\.]+)\s*}}/g
+        let match: RegExpExecArray | null
+        while ((match = regex.exec(content)) !== null) {
+          const varName = match[1].split('.').shift() // 取出最外层变量名
+          if (varName && !varName.startsWith('#') && !varName.startsWith('/')) {
+            variables.add(varName)
+          }
+        }
+      }
+    } catch {
+      // ignore errors – fallback to common variables only
     }
 
-    return [...commonVariables, ...(typeSpecificVariables[projectType] || [])]
+    return Array.from(variables)
   }
 
   /**

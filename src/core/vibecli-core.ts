@@ -7,6 +7,8 @@ import { execSync } from 'child_process'
 import Mustache from 'mustache'
 import crypto from 'crypto'
 import { fileURLToPath } from 'url'
+import { ensureDependenciesInstalled } from '../utils/dependency-checker.js'
+import { verifySha256 } from '../utils/signature.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -459,6 +461,30 @@ export class VibeCLICore {
     // 复制和渲染模板文件
     await this.copyAndRenderTemplate(templatePath, projectPath, templateVars)
 
+    // 校验模板文件签名
+    const sigFiles = (await this.getAllFiles(templatePath)).filter(f => f.endsWith('.sha256'))
+    for (const sigFile of sigFiles) {
+      const targetRel = path.relative(templatePath, sigFile.replace(/\.sha256$/, ''))
+      const targetFile = path.join(projectPath, targetRel)
+      const ok = await verifySha256(targetFile, sigFile)
+      if (!ok) {
+        console.warn(`[VibeCLI] 签名校验失败: ${targetRel}`)
+      }
+    }
+
+    // 将官方defaults复制为项目覆盖层，供用户自定义
+    try {
+      const defaultsDir = path.join(__dirname, '../mcp/config/defaults')
+      const targetConfigDir = path.join(projectPath, 'vibecli-config')
+      await fs.copy(defaultsDir, targetConfigDir, { overwrite: false, errorOnExist: false })
+
+      // 收集拷贝的文件列表
+      const copied = await this.getAllFiles(targetConfigDir)
+      generatedFiles.push(...copied.map(f => path.relative(projectPath, f)))
+    } catch (copyErr) {
+      console.warn('[VibeCLI] 复制默认配置失败:', copyErr)
+    }
+
     // 递归获取所有生成的文件
     const allFiles = await this.getAllFiles(projectPath)
     generatedFiles.push(...allFiles.map(file => path.relative(projectPath, file)))
@@ -624,6 +650,17 @@ export class VibeCLICore {
   }
 
   private async installDependencies(projectPath: string): Promise<void> {
+    // 使用依赖检查器自动安装缺失的核心依赖
+    const deps = {
+      tailwindcss: '^3',
+      autoprefixer: '^10',
+      postcss: '^8',
+      prisma: '^5',
+      '@prisma/client': '^5'
+    }
+    await ensureDependenciesInstalled(projectPath, deps)
+
+    // 执行常规安装，确保 lockfile 与依赖同步
     process.chdir(projectPath)
     execSync('npm install', { stdio: 'pipe' })
   }

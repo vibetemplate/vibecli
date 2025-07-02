@@ -1,7 +1,7 @@
 {
   "name": "vibe-cli-tool",
-  "version": "1.7.2",
-  "description": "VibeCLI v1.7.1 - 完整测试覆盖，98个测试全部通过，企业级Web全栈应用CLI工具",
+  "version": "1.8.0",
+  "description": "VibeCLI v1.8 - 零配置体验，智能聊天助手，环境诊断修复，三层配置系统，企业级Web全栈应用CLI工具",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,7 @@
     "vibecli-mcp-server": "dist/mcp/mcp-server.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp -r src/mcp/config/defaults dist/mcp/config/",
     "dev": "tsc --watch",
     "prepublishOnly": "npm run build",
     "test": "jest --passWithNoTests",
@@ -68,6 +68,8 @@
   "homepage": "https://github.com/vibetemplate/vibecli#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.13.2",
+    "@prisma/client": "^5.22.0",
+    "autoprefixer": "^10.4.21",
     "chalk": "^5.3.0",
     "commander": "^11.1.0",
     "execa": "^8.0.1",
@@ -75,7 +77,10 @@
     "inquirer": "^9.2.12",
     "mustache": "^4.2.0",
     "ora": "^7.0.1",
+    "postcss": "^8.5.6",
+    "prisma": "^5.22.0",
     "semver": "^7.5.4",
+    "tailwindcss": "^3.4.17",
     "validate-npm-package-name": "^5.0.0",
     "zod": "^3.25.67"
   },

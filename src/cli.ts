@@ -7,6 +7,10 @@ import { addFeature } from './commands/add.js'
 import { deployApp } from './commands/deploy.js'
 import { generateApi } from './commands/generate.js'
 import { version } from './utils/version.js'
+import { doctor } from './commands/doctor.js'
+import { configCmd } from './commands/config.js'
+import { GlobalConfig } from './mcp/config/config-provider.js'
+import { chat } from './commands/chat.js'
 
 const program = new Command()
 
@@ -15,12 +19,17 @@ program
   .description('VibeCLI - AI驱动的Web全栈应用CLI工具')
   .version(version)
 
+// 初始化配置（无需阻塞 CLI 启动）
+GlobalConfig.load().catch(err => {
+  console.error('配置加载失败:', err)
+})
+
 // 创建新应用
 program
   .command('create <project-name>')
   .description('创建新的Web全栈应用')
   .option('-t, --template <template>', '选择项目模板', 'default')
-  .option('-d, --database <database>', '选择数据库类型', 'postgresql')
+  .option('-d, --database <database>', '选择数据库类型', 'sqlite')
   .option('-f, --force', '强制覆盖现有目录')
   .option('--no-auth', '不包含认证系统')
   .option('--no-admin', '不包含管理面板')
@@ -47,6 +56,24 @@ program
   .option('-p, --platform <platform>', '部署平台', 'vercel')
   .option('--env <env>', '环境配置文件')
   .action(deployApp)
+
+// Doctor
+program
+  .command('doctor')
+  .description('检查并修复本地开发环境')
+  .action(doctor)
+
+// Chat
+program
+  .command('chat')
+  .description('与 VibeCLI 智能助手对话')
+  .action(chat)
+
+// Config
+program
+  .command('config <action>')
+  .description('配置文件相关操作 (validate|diff|migrate|reset)')
+  .action(configCmd)
 
 // MCP相关命令 - 使用单独的可执行文件 vibecli-mcp-server
 

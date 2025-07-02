@@ -1,0 +1,57 @@
+{
+  "userExperience": [
+    "beginner",
+    "intermediate",
+    "expert"
+  ],
+  "developmentPhase": [
+    "planning",
+    "development",
+    "optimization"
+  ],
+  "userExperienceIndicators": {
+    "beginner": [
+      "新手",
+      "初学",
+      "不懂",
+      "学习",
+      "教程",
+      "怎么",
+      "如何",
+      "beginner",
+      "new",
+      "learn",
+      "tutorial",
+      "how to"
+    ],
+    "expert": [
+      "架构",
+      "优化",
+      "性能",
+      "扩展",
+      "微服务",
+      "高并发",
+      "architecture",
+      "optimize",
+      "scalable",
+      "microservice"
+    ]
+  },
+  "developmentPhaseIndicators": {
+    "planning": [
+      "计划",
+      "设计",
+      "规划",
+      "架构",
+      "plan",
+      "design"
+    ],
+    "optimization": [
+      "优化",
+      "性能",
+      "部署",
+      "deploy",
+      "optimize"
+    ]
+  }
+}
