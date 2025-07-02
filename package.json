@@ -1,6 +1,6 @@
 {
   "name": "vibe-cli-tool",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "VibeCLI v1.9 - 模板商店生态，智能部署生成，多语言支持，交互式学习系统，企业级Web全栈应用CLI工具",
   "type": "module",
   "main": "dist/index.js",
