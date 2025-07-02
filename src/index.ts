@@ -18,4 +18,4 @@ export type {
 } from './core/types.js'
 
 // 版本信息
-export const version = '1.7.0' 
+export const version = '1.7.1' 

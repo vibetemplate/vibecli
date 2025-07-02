@@ -1,7 +1,7 @@
 {
   "name": "vibe-cli-tool",
-  "version": "1.7.0",
-  "description": "VibeCLI v1.7.0 - 完整测试覆盖，98个测试全部通过，企业级Web全栈应用CLI工具",
+  "version": "1.7.1",
+  "description": "VibeCLI v1.7.1 - 完整测试覆盖，98个测试全部通过，企业级Web全栈应用CLI工具",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

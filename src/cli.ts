@@ -12,7 +12,7 @@ const program = new Command()
 program
   .name('vibecli')
   .description('VibeCLI - AI驱动的Web全栈应用CLI工具')
-  .version('1.6.0')
+  .version('1.7.1')
 
 // 创建新应用
 program
