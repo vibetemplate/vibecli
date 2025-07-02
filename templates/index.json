@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2025-07-02T12:00:00Z",
+  "storeVersion": "1.0",
+  "templates": [
+    {
+      "name": "default",
+      "description": "简洁的Next.js项目模板，包含TypeScript和Tailwind CSS",
+      "latest": "1.0.0",
+      "versions": [
+        {
+          "version": "1.0.0",
+          "file": "default/default-1.0.0.zip"
+        }
+      ]
+    },
+    {
+      "name": "crud",
+      "description": "基础 CRUD 项目模板",
+      "latest": "1.0.0",
+      "versions": [
+        {
+          "version": "1.0.0",
+          "file": "crud/crud-1.0.0.zip"
+        }
+      ]
+    },
+    {
+      "name": "auth-system",
+      "description": "内置认证系统的全栈模板",
+      "latest": "1.0.0",
+      "versions": [
+        {
+          "version": "1.0.0",
+          "file": "auth-system/auth-system-1.0.0.zip"
+        }
+      ]
+    },
+    {
+      "name": "ecommerce",
+      "description": "功能完整的电商网站模板",
+      "latest": "1.0.0",
+      "versions": [
+        {
+          "version": "1.0.0",
+          "file": "ecommerce/ecommerce-1.0.0.zip"
+        }
+      ]
+    }
+  ]
+} 

@@ -15,7 +15,7 @@ export async function deployApp(options: DeployOptions) {
 
   try {
     // 验证部署平台
-    const supportedPlatforms = ['vercel', 'netlify', 'aws', 'docker']
+    const supportedPlatforms = ['vercel', 'netlify', 'aws', 'docker', 'aliyun', 'cloudflare']
     if (!supportedPlatforms.includes(options.platform.toLowerCase())) {
       console.error(chalk.red(`❌ 不支持的部署平台: ${options.platform}`))
       console.log(chalk.yellow('支持的平台: ' + supportedPlatforms.join(', ')))
@@ -25,6 +25,7 @@ export async function deployApp(options: DeployOptions) {
     // 构建部署配置
     const deployConfig: DeploymentConfig = {
       platform: options.platform.toLowerCase() as any,
+      projectName: process.cwd().split('/').pop() || 'vibecli-app',
       environment: 'production',
       envFile: options.env
     }

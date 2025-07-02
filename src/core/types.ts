@@ -43,9 +43,11 @@ export interface FeatureResult {
 }
 
 export interface DeploymentConfig {
-  platform: 'vercel' | 'netlify' | 'aws' | 'docker'
+  platform: 'vercel' | 'netlify' | 'aws' | 'docker' | 'aliyun' | 'cloudflare'
+  projectName: string
   environment: 'development' | 'staging' | 'production'
   envFile?: string
+  customDomain?: string
   customConfig?: Record<string, any>
 }
 

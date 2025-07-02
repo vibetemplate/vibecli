@@ -447,12 +447,19 @@ export class VibeCLICore {
 
     // 根据模板生成项目
     const templateName = this.getTemplateName(config)
-    const templatesDir = getTemplatesDirectory()
-    const templatePath = path.join(templatesDir, templateName)
+    // 优先使用本地安装的模板（template install 命令）
+    const { getInstalledTemplatePath } = await import('../utils/template-store.js')
+    let templatePath: string | null = getInstalledTemplatePath(templateName)
+
+    if (!templatePath) {
+      // 回退到内置模板
+      const templatesDir = getTemplatesDirectory()
+      templatePath = path.join(templatesDir, templateName)
+    }
     
     // 检查模板是否存在
-    if (!fs.existsSync(templatePath)) {
-      throw new Error(`模板 ${templateName} 不存在。模板目录: ${templatesDir}，可用模板: default, auth-system, ecommerce`)
+    if (!templatePath || !fs.existsSync(templatePath)) {
+      throw new Error(`模板 ${templateName} 不存在。请先执行 "vibecli template install ${templateName}" 或检查内置模板。`)
     }
 
     // 准备模板变量
@@ -681,12 +688,20 @@ export class VibeCLICore {
     execSync('npm run build', { stdio: 'pipe' })
   }
 
-  private async executeDeployment(projectPath: string, config: DeploymentConfig): Promise<{url?: string, deploymentId?: string}> {
-    // 这里会根据config.platform执行相应的部署逻辑
-    // 暂时返回模拟数据
-    return {
-      url: `https://${config.platform}-deployed-app.com`,
-      deploymentId: `deploy_${Date.now()}`
+  private async executeDeployment(
+    projectPath: string,
+    config: DeploymentConfig
+  ): Promise<{ url?: string; deploymentId?: string }> {
+    const { generateDeploymentArtifacts } = await import('../utils/deploy-generator.js')
+    try {
+      const result = await generateDeploymentArtifacts(projectPath, config)
+      return result
+    } catch (err: any) {
+      console.error('Deployment generation failed', err)
+      return {
+        deploymentId: undefined,
+        url: undefined,
+      }
     }
   }
 

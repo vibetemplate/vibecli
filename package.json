@@ -1,7 +1,7 @@
 {
   "name": "vibe-cli-tool",
-  "version": "1.8.0",
-  "description": "VibeCLI v1.8 - 零配置体验，智能聊天助手，环境诊断修复，三层配置系统，企业级Web全栈应用CLI工具",
+  "version": "1.9.0",
+  "description": "VibeCLI v1.9 - 模板商店生态，智能部署生成，多语言支持，交互式学习系统，企业级Web全栈应用CLI工具",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,7 +15,7 @@
     "prepublishOnly": "npm run build",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test:coverage": "jest --coverage --maxWorkers=2",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write src/**/*.ts",
@@ -28,7 +28,8 @@
     "version:major": "npm version major && npm run build",
     "release:patch": "npm run version:patch && npm publish && git push --follow-tags",
     "release:minor": "npm run version:minor && npm publish && git push --follow-tags",
-    "release:major": "npm run version:major && npm publish && git push --follow-tags"
+    "release:major": "npm run version:major && npm publish && git push --follow-tags",
+    "template:index": "ts-node --esm --transpile-only scripts/generate-template-index.ts"
   },
   "keywords": [
     "web",
@@ -81,6 +82,11 @@
     "prisma": "^5.22.0",
     "semver": "^7.5.4",
     "tailwindcss": "^3.4.17",
+    "uuid": "^9.0.0",
+    "@types/uuid": "^9.0.7",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1",
+    "adm-zip": "^0.5.10",
     "validate-npm-package-name": "^5.0.0",
     "zod": "^3.25.67"
   },
@@ -97,6 +103,8 @@
     "eslint": "^8.54.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
+    "@types/adm-zip": "^0.5.1",
+    "ts-node": "^10.9.2",
     "jest": "^29.7.0",
     "prettier": "^3.1.0",
     "ts-jest": "^29.1.1",

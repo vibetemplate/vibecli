@@ -11,6 +11,9 @@ import { doctor } from './commands/doctor.js'
 import { configCmd } from './commands/config.js'
 import { GlobalConfig } from './mcp/config/config-provider.js'
 import { chat } from './commands/chat.js'
+import { learn } from './commands/learn.js'
+import { templateCmd } from './commands/template.js'
+import { publishTplCmd } from './commands/publish-template.js'
 
 const program = new Command()
 
@@ -18,6 +21,7 @@ program
   .name('vibecli')
   .description('VibeCLI - AI驱动的Web全栈应用CLI工具')
   .version(version)
+  .option('-l, --lang <lang>', 'CLI language (zh|en)', 'zh')
 
 // 初始化配置（无需阻塞 CLI 启动）
 GlobalConfig.load().catch(err => {
@@ -69,6 +73,25 @@ program
   .description('与 VibeCLI 智能助手对话')
   .action(chat)
 
+// Learn
+program
+  .command('learn [topic]')
+  .description('交互式教程，快速上手 VibeCLI')
+  .action(learn)
+
+// Template store
+program
+  .command('template <action> [name]')
+  .description('模板商店操作 (list|install|remove)')
+  .action(templateCmd)
+
+// Publish template
+program
+  .command('publish-template <templateDir>')
+  .description('发布本地模板到远程模板商店')
+  .option('--validate-only', '仅验证和打包，不提交')
+  .action(publishTplCmd)
+
 // Config
 program
   .command('config <action>')
@@ -93,3 +116,9 @@ program.on('--help', () => {
 })
 
 program.parse()
+
+// After parsing options, set language env variable for other modules
+const globalOpts = program.opts<{ lang?: string }>()
+if (globalOpts.lang) {
+  process.env.VIBECLI_LANG = globalOpts.lang
+}
